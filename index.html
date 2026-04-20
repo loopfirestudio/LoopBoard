@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LoopBoard · Task Manager</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ── DARK MODE (VS Code Dark+ palette) ── */
+    :root {
+      --bg: #1e1e1e;       /* editor bg */
+      --surface: #252526;  /* sidebar */
+      --surface2: #2d2d2d; /* panels */
+      --surface3: #3c3c3c; /* hover states */
+      --border: #3e3e42;   /* VS Code panel border */
+      --text: #d4d4d4;     /* default text */
+      --text-muted: #858585; /* line numbers */
+      --text-dim: #a0a0a0;
+      --accent: #dcdcaa;          /* function/method yellow */
+      --accent-dim: rgba(220,220,170,0.11);
+      --admin: #f48771;           /* error/warning salmon */
+      --admin-dim: rgba(244,135,113,0.12);
+      --green: #b5cea8;           /* numeric literal green */
+      --green-dim: rgba(181,206,168,0.12);
+      --blue: #569cd6;            /* keyword blue */
+      --blue-dim: rgba(86,156,214,0.13);
+      --purple: #c586c0;          /* VS Code purple */
+      --purple-dim: rgba(197,134,192,0.13);
+      --cyan: #4ec9b0;            /* type/class teal */
+      --pink: #ce9178;            /* string orange */
+      --radius: 6px; --mono: 'JetBrains Mono', monospace; --sans: 'Outfit', sans-serif;
+      --header-h: 50px; --subheader-h: 40px;
+      color-scheme: dark;
+    }
+
+    /* ── LIGHT MODE (warm pastel, easy on the eyes) ── */
+    body.light {
+      --bg: #f0ece6;          /* warm parchment */
+      --surface: #e8e3dc;     /* slightly darker parchment */
+      --surface2: #ddd8d0;
+      --surface3: #d0cac1;
+      --border: #bfb9b0;
+      --text: #2a2520;        /* warm very dark brown — max contrast */
+      --text-muted: #7a7268;
+      --text-dim: #5c5650;
+      --accent: #7c600a;            /* amber, readable on light */
+      --accent-dim: rgba(124,96,10,0.10);
+      --admin: #b83030;             /* deep red */
+      --admin-dim: rgba(184,48,48,0.10);
+      --green: #2e6e46;             /* forest green */
+      --green-dim: rgba(46,110,70,0.10);
+      --blue: #1a5fa0;              /* deep cobalt */
+      --blue-dim: rgba(26,95,160,0.10);
+      --purple: #6b3fa0;            /* muted violet */
+      --purple-dim: rgba(107,63,160,0.10);
+      --cyan: #1a6e6e;              /* teal */
+      --pink: #8c3a20;              /* terracotta */
+      color-scheme: light;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; overflow: hidden; }
+
+    /* ── LOGIN ── */
+    #login-screen { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: var(--bg); z-index: 100; }
+    .login-grid { position: absolute; inset: 0; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 48px 48px; opacity: 0.4; }
+    .login-box { position: relative; text-align: center; padding: 60px 80px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+    .login-logo { font-family: var(--mono); font-size: 10px; letter-spacing: 5px; color: var(--accent); text-transform: uppercase; margin-bottom: 12px; }
+    .login-title { font-size: 52px; font-weight: 700; letter-spacing: -3px; margin-bottom: 6px; background: linear-gradient(135deg, var(--text) 40%, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .login-sub { color: var(--text-muted); font-size: 13px; margin-bottom: 52px; letter-spacing: 0.5px; }
+    .login-prompt { font-family: var(--mono); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 20px; }
+    .login-options { display: flex; gap: 14px; justify-content: center; }
+    .login-btn { padding: 22px 56px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-family: var(--sans); font-size: 20px; font-weight: 700; cursor: pointer; border-radius: 8px; transition: all 0.2s; position: relative; overflow: hidden; letter-spacing: -0.5px; }
+    .login-btn::after { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity 0.2s; }
+    .login-btn.lahner::after { background: var(--admin-dim); }
+    .login-btn.tamme::after { background: var(--accent-dim); }
+    .login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+    .login-btn.lahner:hover { border-color: var(--admin); } .login-btn.lahner:hover::after { opacity: 1; }
+    .login-btn.tamme:hover { border-color: var(--accent); } .login-btn.tamme:hover::after { opacity: 1; }
+    .btn-badge { display: block; font-family: var(--mono); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; margin-top: 5px; opacity: 0.45; font-weight: 400; }
+
+    /* ── PW OVERLAY ── */
+    #pw-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+    #pw-overlay.active { opacity: 1; pointer-events: all; }
+    .pw-box { background: var(--surface); border: 1px solid var(--border); border-top: 2px solid var(--admin); border-radius: 10px; padding: 32px 36px; width: 360px; text-align: center; transform: translateY(8px); transition: transform 0.2s; }
+    #pw-overlay.active .pw-box { transform: translateY(0); }
+    .pw-box.shake { animation: shake 0.4s ease; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+    .pw-icon { font-size: 28px; margin-bottom: 12px; }
+    .pw-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .pw-sub { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--admin); margin-bottom: 24px; }
+    #pw-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 11px 14px; color: var(--text); font-family: var(--mono); font-size: 15px; letter-spacing: 3px; outline: none; transition: border-color 0.15s; text-align: center; margin-bottom: 8px; }
+    #pw-input:focus { border-color: var(--admin); } #pw-input.wrong { border-color: var(--admin); background: var(--admin-dim); }
+    .pw-error { font-size: 11px; color: var(--admin); height: 16px; margin-bottom: 16px; transition: opacity 0.2s; opacity: 0; }
+    .pw-error.visible { opacity: 1; }
+    .pw-actions { display: flex; gap: 8px; }
+    .pw-btn { flex: 1; padding: 10px; border-radius: var(--radius); font-family: var(--sans); font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); transition: all 0.15s; }
+    .pw-btn.cancel { background: var(--surface2); color: var(--text-muted); } .pw-btn.cancel:hover { background: var(--surface3); color: var(--text); }
+    .pw-btn.confirm { background: var(--admin); color: #fff; border-color: var(--admin); } .pw-btn.confirm:hover { background: #e03e3e; }
+
+    /* ── HEADER ── */
+    #header { height: var(--header-h); background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 16px; gap: 10px; position: sticky; top: 0; z-index: 10; }
+    .header-logo { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: 3px; flex-shrink: 0; }
+    .header-sep { width: 1px; height: 18px; background: var(--border); flex-shrink: 0; }
+    .header-user { display: flex; align-items: center; gap: 8px; font-size: 13px; flex-shrink: 0; }
+    .user-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+    .user-dot.admin { background: var(--admin); }
+    .user-name { font-weight: 600; }
+    .user-role { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); padding: 2px 7px; border: 1px solid var(--border); border-radius: 3px; }
+    .header-actions { margin-left: auto; display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+
+    /* ── SUB-HEADER ── */
+    #sub-header { height: var(--subheader-h); background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 16px; gap: 6px; overflow: hidden; }
+    .filter-pill { padding: 3px 11px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.15s; font-family: var(--sans); white-space: nowrap; }
+    .filter-pill:hover { border-color: var(--text-dim); color: var(--text); }
+    .filter-pill.active { background: var(--accent); color: #000; border-color: var(--accent); }
+    .filter-pill.f-mine.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .filter-pill.f-today.active { background: var(--admin); border-color: var(--admin); color: #fff; }
+    .filter-pill.f-high.active { background: var(--admin); border-color: var(--admin); color: #fff; }
+    .sub-sep { width: 1px; height: 16px; background: var(--border); margin: 0 2px; flex-shrink: 0; }
+    #milestone-bar-wrap { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-shrink: 0; }
+    .ms-label { font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); white-space: nowrap; }
+    #milestone-select { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--sans); font-size: 11px; font-weight: 600; padding: 3px 8px; cursor: pointer; outline: none; max-width: 140px; }
+    #milestone-select:focus { border-color: var(--purple); }
+    .ms-progress-wrap { display: flex; flex-direction: column; gap: 2px; min-width: 80px; }
+    .ms-progress-track { height: 4px; background: var(--surface3); border-radius: 3px; overflow: hidden; }
+    .ms-progress-fill { height: 100%; background: var(--purple); border-radius: 3px; transition: width 0.4s ease; }
+    .ms-progress-label { font-family: var(--mono); font-size: 9px; color: var(--text-muted); }
+
+    /* ── BUTTONS ── */
+    .btn { padding: 5px 12px; border-radius: var(--radius); font-family: var(--sans); font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text); transition: all 0.15s; display: inline-flex; align-items: center; gap: 5px; }
+    .btn:hover { background: var(--surface3); border-color: var(--text-dim); }
+    .btn.primary { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 700; } .btn.primary:hover { background: #d97706; }
+    .btn.ghost { background: transparent; border-color: transparent; color: var(--text-muted); font-size: 11px; } .btn.ghost:hover { background: var(--surface2); color: var(--text); border-color: var(--border); }
+    .btn.purple { background: var(--purple-dim); color: var(--purple); border-color: rgba(139,92,246,0.3); } .btn.purple:hover { background: rgba(139,92,246,0.22); }
+    .btn.export { background: var(--green-dim); color: var(--green); border-color: rgba(34,197,94,0.3); } .btn.export:hover { background: rgba(34,197,94,0.22); }
+
+    /* ── BOARD WRAPPER ── */
+    #board-wrapper { display: flex; height: calc(100vh - var(--header-h) - var(--subheader-h)); overflow: hidden; }
+    #board { flex: 1; display: flex; gap: 12px; padding: 16px; overflow-x: auto; overflow-y: hidden; align-items: flex-start; }
+    #board::-webkit-scrollbar { height: 5px; } #board::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── COLUMN ── */
+    .column { width: 278px; flex-shrink: 0; display: flex; flex-direction: column; max-height: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: border-color 0.15s; }
+    .column.drag-over { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-dim); }
+    .col-header { padding: 10px 12px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .col-color { width: 3px; height: 14px; border-radius: 2px; flex-shrink: 0; }
+    .col-title { font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; flex: 1; color: var(--text-dim); }
+    .col-count { font-family: var(--mono); font-size: 10px; color: var(--text-muted); background: var(--surface2); padding: 2px 7px; border-radius: 10px; border: 1px solid var(--border); }
+    .col-delete-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 11px; width: 18px; height: 18px; border-radius: 3px; transition: all 0.15s; display: none; align-items: center; justify-content: center; }
+    .col-delete-btn:hover { color: var(--admin); background: var(--admin-dim); }
+    body.is-admin .col-delete-btn { display: flex; }
+    .col-cards { flex: 1; overflow-y: auto; padding: 9px; display: flex; flex-direction: column; gap: 7px; min-height: 80px; }
+    .col-cards::-webkit-scrollbar { width: 3px; } .col-cards::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .col-drop-hint { border: 1.5px dashed var(--border); border-radius: 6px; height: 50px; display: none; align-items: center; justify-content: center; color: var(--text-muted); font-size: 11px; }
+    .column.drag-over .col-drop-hint { display: flex; }
+    .col-add-btn { padding: 8px 12px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 7px; cursor: pointer; font-size: 12px; color: var(--text-muted); transition: all 0.15s; flex-shrink: 0; user-select: none; }
+    .col-add-btn:hover { color: var(--accent); background: var(--accent-dim); }
+    #add-column-btn { width: 200px; flex-shrink: 0; height: 44px; border: 1px dashed var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 7px; cursor: pointer; color: var(--text-muted); font-size: 12px; font-weight: 600; transition: all 0.2s; background: transparent; font-family: var(--sans); align-self: flex-start; }
+    #add-column-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+    /* ── CARD ── */
+    .card { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 10px; cursor: grab; transition: all 0.15s; position: relative; user-select: none; }
+    .card:active { cursor: grabbing; }
+    .card:hover { border-color: #444; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.35); }
+    .card.dragging { opacity: 0.35; cursor: grabbing; transform: scale(0.98); }
+    .card.overdue { border-color: rgba(255,77,77,0.45); background: rgba(255,77,77,0.04); }
+    .card.overdue:hover { border-color: var(--admin); }
+    .card.blocked { opacity: 0.52; cursor: not-allowed; filter: grayscale(0.3); }
+    .card.blocked:hover { transform: none; box-shadow: none; }
+    .card.hidden-by-filter { display: none; }
+    .card-title { font-size: 13px; font-weight: 500; line-height: 1.4; margin-bottom: 7px; padding-right: 50px; }
+    .card-desc { font-size: 11px; color: var(--text-dim); line-height: 1.5; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .card-blocked-hint { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--admin); background: var(--admin-dim); border-radius: 4px; padding: 4px 7px; margin-bottom: 7px; border: 1px solid rgba(255,77,77,0.2); }
+    .card-meta { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin-top: 2px; }
+    .cbadge { font-family: var(--mono); font-size: 9px; letter-spacing: 0.5px; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; white-space: nowrap; }
+    .cb-author { background: var(--accent-dim); color: var(--accent); }
+    .cb-author.admin-b { background: var(--admin-dim); color: var(--admin); }
+    .cb-assignee { background: var(--blue-dim); color: var(--blue); }
+    .cb-assignee.admin-b { background: var(--admin-dim); color: var(--admin); }
+    .cb-prio-hoch { background: var(--admin-dim); color: var(--admin); }
+    .cb-prio-mittel { background: var(--accent-dim); color: var(--accent); }
+    .cb-prio-niedrig { background: var(--green-dim); color: var(--green); }
+    .cb-milestone { background: var(--purple-dim); color: var(--purple); max-width: 88px; overflow: hidden; text-overflow: ellipsis; display: inline-block; }
+    .cb-due { background: var(--surface3); color: var(--text-dim); }
+    .cb-due.overdue-b { background: var(--admin-dim); color: var(--admin); }
+    .cb-due.today-b { background: var(--accent-dim); color: var(--accent); }
+    .card-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 3px; opacity: 0; transition: opacity 0.15s; }
+    .card:hover .card-actions { opacity: 1; }
+    .card-action-btn { width: 22px; height: 22px; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; transition: all 0.15s; background: var(--surface3); color: var(--text-dim); }
+    .card-action-btn.edit:hover { background: var(--accent-dim); color: var(--accent); }
+    .card-action-btn.del:hover { background: var(--admin-dim); color: var(--admin); }
+
+    /* ── MODALS ── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+    .modal-overlay.active { opacity: 1; pointer-events: all; }
+    .modal { background: var(--surface); border: 1px solid #333; border-radius: 10px; padding: 26px; width: 500px; max-width: 94vw; max-height: 90vh; overflow-y: auto; transform: translateY(10px); transition: transform 0.2s; }
+    .modal-overlay.active .modal { transform: translateY(0); }
+    .modal-title { font-size: 15px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    .modal-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+    .modal-dot.purple { background: var(--purple); }
+    .form-group { margin-bottom: 13px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 13px; }
+    .form-row .form-group { margin-bottom: 0; }
+    .form-label { display: block; font-family: var(--mono); font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+    .form-input, .form-textarea, .form-select { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 9px 11px; color: var(--text); font-family: var(--sans); font-size: 13px; outline: none; transition: border-color 0.15s; }
+    .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--accent); }
+    .form-textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+    .form-select option { background: var(--surface2); color: var(--text); }
+    input[type="date"].form-input::-webkit-calendar-picker-indicator { filter: invert(0.5); cursor: pointer; }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+    /* ── ACTIVITY ── */
+    #activity-panel { width: 268px; flex-shrink: 0; border-left: 1px solid var(--border); background: var(--surface); display: flex; flex-direction: column; overflow: hidden; }
+    .activity-header { padding: 11px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+    .activity-header-title { font-family: var(--mono); font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--text-muted); flex: 1; }
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--admin); animation: blink 2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+    .activity-count { font-family: var(--mono); font-size: 9px; color: var(--text-muted); }
+    .activity-list { flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+    .activity-list::-webkit-scrollbar { width: 3px; } .activity-list::-webkit-scrollbar-thumb { background: var(--border); }
+    .activity-item { padding: 8px 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; border-left: 2px solid var(--border); }
+    .activity-item.lahner { border-left-color: var(--admin); } .activity-item.tamme { border-left-color: var(--accent); }
+    .activity-user { font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 3px; }
+    .activity-user.lahner { color: var(--admin); } .activity-user.tamme { color: var(--accent); }
+    .activity-text { font-size: 11px; color: var(--text-dim); line-height: 1.4; }
+    .activity-time { font-family: var(--mono); font-size: 9px; color: var(--text-muted); margin-top: 4px; }
+    .activity-empty { text-align: center; color: var(--text-muted); font-size: 12px; padding: 28px 14px; }
+
+    /* ── TOAST ── */
+    #toast-container { position: fixed; bottom: 16px; right: 16px; display: flex; flex-direction: column; gap: 6px; z-index: 300; pointer-events: none; }
+    .toast { padding: 9px 15px; background: var(--surface2); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; font-size: 13px; animation: toastIn 0.25s ease; pointer-events: all; }
+    .toast.error { border-left-color: var(--admin); }
+    @keyframes toastIn { from{transform:translateX(12px);opacity:0} to{transform:translateX(0);opacity:1} }
+
+    /* ── UTILS ── */
+    .hidden { display: none !important; }
+    /* VS Code-palette column strips */
+    .col-accent-0{background:var(--blue)}   /* keyword blue   #569cd6 */
+    .col-accent-1{background:var(--accent)} /* method yellow  #dcdcaa */
+    .col-accent-2{background:var(--purple)} /* VS purple      #c586c0 */
+    .col-accent-3{background:var(--cyan)}   /* type teal      #4ec9b0 */
+    .col-accent-4{background:var(--pink)}   /* string orange  #ce9178 */
+    .col-accent-5{background:var(--green)}  /* number green   #b5cea8 */
+
+    /* Light mode surface depth via shadow instead of darkness */
+    body.light .column { box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    body.light .card { box-shadow: 0 1px 3px rgba(0,0,0,0.07); }
+    body.light .card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.12); }
+    body.light .modal { box-shadow: 0 8px 40px rgba(0,0,0,0.14); }
+    body.light #header { box-shadow: 0 1px 6px rgba(0,0,0,0.08); }
+    body.light .login-box { box-shadow: 0 4px 32px rgba(0,0,0,0.10); }
+    body.light .pw-box { box-shadow: 0 4px 24px rgba(0,0,0,0.10); }
+    body.light #activity-panel { box-shadow: -1px 0 6px rgba(0,0,0,0.06); }
+    body.light .login-grid { opacity: 0.25; }
+
+    /* Theme toggle button */
+    #theme-toggle { padding: 4px 10px; border-radius: var(--radius); font-family: var(--mono); font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text-muted); transition: all 0.2s; letter-spacing: 0.5px; }
+    #theme-toggle:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+    /* Milestone list in modal */
+    .ms-list-item { display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--border); }
+    .ms-list-item:last-child { border-bottom: none; }
+    .ms-del-btn { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:11px; padding:2px 6px; border-radius:3px; transition:all 0.15s; }
+    .ms-del-btn:hover { color:var(--admin); background:var(--admin-dim); }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-grid"></div>
+  <div class="login-box">
+    <div class="login-logo">LoopFire Studio</div>
+    <h1 class="login-title">LoopBoard</h1>
+    <p class="login-sub">Task Management · Echtzeit · Firebase</p>
+    <div class="login-prompt">Wer bist du?</div>
+    <div class="login-options">
+      <button class="login-btn lahner" onclick="openPwOverlay()">Lähner<span class="btn-badge">Admin</span></button>
+      <button class="login-btn tamme" onclick="login('Tamme')">Tamme<span class="btn-badge">Mitglied</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- PW OVERLAY -->
+<div id="pw-overlay">
+  <div class="pw-box" id="pw-box">
+    <div class="pw-icon">🔐</div>
+    <div class="pw-title">Admin-Zugang</div>
+    <div class="pw-sub">Lähner · Passwort erforderlich</div>
+    <input type="password" id="pw-input" placeholder="Passwort eingeben..." autocomplete="off" maxlength="30">
+    <div class="pw-error" id="pw-error">Falsches Passwort. Bitte nochmal versuchen.</div>
+    <div class="pw-actions">
+      <button class="pw-btn cancel" onclick="closePwOverlay()">Abbrechen</button>
+      <button class="pw-btn confirm" onclick="checkPassword()">Bestätigen</button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div id="header" class="hidden">
+  <div class="header-logo">LOOPBOARD</div>
+  <div class="header-sep"></div>
+  <div class="header-user">
+    <div class="user-dot" id="user-dot"></div>
+    <span class="user-name" id="user-name-display"></span>
+    <span class="user-role" id="user-role-display"></span>
+  </div>
+  <div class="header-actions">
+    <button class="btn purple hidden" id="btn-add-milestone" onclick="openMilestoneModal()">🎯 Milestone</button>
+    <button class="btn export hidden" id="btn-export" onclick="exportWeeklyReport()">↓ Wochenrückblick</button>
+    <div class="header-sep"></div>
+    <button id="theme-toggle" onclick="toggleTheme()" title="Light / Dark Mode">☀︎</button>
+    <button class="btn ghost" onclick="login(null)">← Wechseln</button>
+  </div>
+</div>
+
+<!-- SUB-HEADER: FILTERS + MILESTONE PROGRESS -->
+<div id="sub-header" class="hidden">
+  <button class="filter-pill f-all active" id="f-all" onclick="setFilter(null)">Alle</button>
+  <button class="filter-pill f-mine" id="f-mine" onclick="setFilter('mine')">👤 Meine</button>
+  <button class="filter-pill f-today" id="f-today" onclick="setFilter('today')">📅 Heute fällig</button>
+  <button class="filter-pill f-high" id="f-high" onclick="setFilter('high')">🔴 Hoch</button>
+  <div class="sub-sep"></div>
+
+  <div id="milestone-bar-wrap" class="hidden">
+    <div class="ms-label">Milestone</div>
+    <select id="milestone-select" onchange="onMilestoneSelectChange()">
+      <option value="">– Alle –</option>
+    </select>
+    <div class="ms-progress-wrap" id="ms-progress-wrap" style="display:none;">
+      <div class="ms-progress-track"><div class="ms-progress-fill" id="ms-progress-fill" style="width:0%"></div></div>
+      <div class="ms-progress-label" id="ms-progress-label">0 / 0</div>
+    </div>
+  </div>
+</div>
+
+<!-- BOARD WRAPPER -->
+<div id="board-wrapper" class="hidden">
+  <div id="board">
+    <button id="add-column-btn" class="hidden" onclick="openAddColumnModal()">＋ Spalte</button>
+  </div>
+  <div id="activity-panel" class="hidden">
+    <div class="activity-header">
+      <div class="live-dot"></div>
+      <div class="activity-header-title">Aktivitäten</div>
+      <div class="activity-count" id="activity-count">0</div>
+    </div>
+    <div class="activity-list" id="activity-list">
+      <div class="activity-empty">Noch keine Aktivitäten</div>
+    </div>
+  </div>
+</div>
+
+<!-- CARD MODAL -->
+<div class="modal-overlay" id="card-modal">
+  <div class="modal">
+    <div class="modal-title"><div class="modal-dot"></div><span id="card-modal-title">Neue Aufgabe</span></div>
+    <div class="form-group">
+      <label class="form-label">Titel *</label>
+      <input type="text" class="form-input" id="card-title-input" placeholder="Was muss erledigt werden?">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Beschreibung</label>
+      <textarea class="form-textarea" id="card-desc-input" placeholder="Details, Links, Notizen..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Priorität</label>
+        <select class="form-select" id="card-priority-input">
+          <option value="mittel">🟡 Mittel</option>
+          <option value="hoch">🔴 Hoch</option>
+          <option value="niedrig">🟢 Niedrig</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fällig am</label>
+        <input type="date" class="form-input" id="card-due-input">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Zugewiesen an</label>
+        <select class="form-select" id="card-assignee-input">
+          <option value="">– Niemand –</option>
+          <option value="Lähner">Lähner</option>
+          <option value="Tamme">Tamme</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Milestone</label>
+        <select class="form-select" id="card-milestone-input">
+          <option value="">– Keiner –</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Blockiert durch (Abhängigkeit)</label>
+      <select class="form-select" id="card-blockedby-input">
+        <option value="">– Keine –</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModal('card-modal')">Abbrechen</button>
+      <button class="btn primary" onclick="saveCard()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- COLUMN MODAL -->
+<div class="modal-overlay" id="column-modal">
+  <div class="modal" style="width:360px;">
+    <div class="modal-title"><div class="modal-dot"></div>Neue Spalte</div>
+    <div class="form-group">
+      <label class="form-label">Name</label>
+      <input type="text" class="form-input" id="column-title-input" placeholder="z.B. In Review, Blockiert...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModal('column-modal')">Abbrechen</button>
+      <button class="btn primary" onclick="saveColumn()">Erstellen</button>
+    </div>
+  </div>
+</div>
+
+<!-- MILESTONE MODAL -->
+<div class="modal-overlay" id="milestone-modal">
+  <div class="modal" style="width:430px;">
+    <div class="modal-title"><div class="modal-dot purple"></div>Milestones verwalten</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Name *</label>
+        <input type="text" class="form-input" id="ms-title-input" placeholder="Alpha, Demo Build, v1.0 ...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Zieldatum</label>
+        <input type="date" class="form-input" id="ms-date-input">
+      </div>
+    </div>
+    <div class="modal-actions" style="margin-top:0;padding-top:0;border-top:none;justify-content:flex-start;">
+      <button class="btn purple" onclick="saveMilestone()">＋ Erstellen</button>
+    </div>
+    <div style="margin-top:18px;border-top:1px solid var(--border);padding-top:14px;">
+      <div class="form-label" style="margin-bottom:10px;">Bestehende Milestones</div>
+      <div id="ms-list"><div style="color:var(--text-muted);font-size:12px;">Noch keine Milestones.</div></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModal('milestone-modal')">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+// ── Theme ──
+(function() {
+  const saved = localStorage.getItem('lb-theme');
+  if (saved === 'light') { document.body.classList.add('light'); updateToggleBtn(); }
+})();
+
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  localStorage.setItem('lb-theme', document.body.classList.contains('light') ? 'light' : 'dark');
+  updateToggleBtn();
+}
+
+function updateToggleBtn() {
+  const btn = document.getElementById('theme-toggle');
+  if (!btn) return;
+  const isLight = document.body.classList.contains('light');
+  btn.textContent = isLight ? '🌙' : '☀︎';
+  btn.title = isLight ? 'Dark Mode' : 'Light Mode';
+}
+
+// ── Firebase ──
+firebase.initializeApp({
+  apiKey: "AIzaSyAy16r_mgPt39-O5ol2CWShH-Zl_v13OoU",
+  authDomain: "loopfire-studio.firebaseapp.com",
+  databaseURL: "https://loopfire-studio-default-rtdb.firebaseio.com",
+  projectId: "loopfire-studio",
+  storageBucket: "loopfire-studio.firebasestorage.app",
+  messagingSenderId: "671968406115",
+  appId: "1:671968406115:web:d5250c8fb2d43034b26656"
+});
+const db = firebase.firestore();
+const FS = firebase.firestore.FieldValue;
+
+// ── State ──
+let currentUser = null, isAdmin = false;
+let columns = [], cards = [], milestones = [];
+let editingCardId = null, currentColumnId = null, draggedCardId = null;
+let activeFilter = null, activeMilestoneId = '';
+let doneColumnId = null;
+let unsubColumns = null, unsubCards = null, unsubActivity = null, unsubMilestones = null;
+const DEFAULT_COLUMNS = ['Backlog','In Progress','Review','Erledigt'];
+const COL_COLORS = ['col-accent-0','col-accent-1','col-accent-2','col-accent-3','col-accent-4','col-accent-5'];
+const ADMIN_PASSWORD = 'adminLoopfire';
+
+// ── Password Gate ──
+function openPwOverlay() {
+  const inp = document.getElementById('pw-input');
+  inp.value = ''; inp.classList.remove('wrong');
+  document.getElementById('pw-error').classList.remove('visible');
+  document.getElementById('pw-overlay').classList.add('active');
+  setTimeout(() => inp.focus(), 150);
+}
+function closePwOverlay() { document.getElementById('pw-overlay').classList.remove('active'); }
+function checkPassword() {
+  if (document.getElementById('pw-input').value === ADMIN_PASSWORD) {
+    closePwOverlay(); login('Lähner');
+  } else {
+    const inp = document.getElementById('pw-input'), box = document.getElementById('pw-box');
+    inp.classList.add('wrong');
+    document.getElementById('pw-error').classList.add('visible');
+    box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
+    inp.value = '';
+    setTimeout(() => inp.classList.remove('wrong'), 1500);
+  }
+}
+document.getElementById('pw-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkPassword();
+  if (e.key === 'Escape') closePwOverlay();
+  document.getElementById('pw-input').classList.remove('wrong');
+  document.getElementById('pw-error').classList.remove('visible');
+});
+
+// ── Login ──
+function login(user) {
+  if (!user) {
+    currentUser = null; isAdmin = false;
+    document.getElementById('login-screen').style.display = 'flex';
+    ['header','sub-header','board-wrapper'].forEach(id => document.getElementById(id).classList.add('hidden'));
+    [unsubColumns, unsubCards, unsubActivity, unsubMilestones].forEach(u => u && u());
+    unsubColumns = unsubCards = unsubActivity = unsubMilestones = null;
+    activeFilter = null; activeMilestoneId = '';
+    return;
+  }
+  currentUser = user; isAdmin = user === 'Lähner';
+  document.getElementById('login-screen').style.display = 'none';
+  ['header','sub-header','board-wrapper'].forEach(id => document.getElementById(id).classList.remove('hidden'));
+  document.getElementById('user-name-display').textContent = user;
+  document.getElementById('user-role-display').textContent = isAdmin ? 'Admin' : 'Mitglied';
+  document.getElementById('user-dot').className = 'user-dot' + (isAdmin ? ' admin' : '');
+
+  const adminEls = ['add-column-btn','btn-add-milestone','btn-export','activity-panel','milestone-bar-wrap'];
+  adminEls.forEach(id => {
+    const el = document.getElementById(id);
+    isAdmin ? el.classList.remove('hidden') : el.classList.add('hidden');
+  });
+  document.body.classList.toggle('is-admin', isAdmin);
+  initFirestore();
+}
+
+// ── Firestore ──
+async function initFirestore() {
+  const snap = await db.collection('columns').get();
+  if (snap.empty) {
+    const batch = db.batch();
+    DEFAULT_COLUMNS.forEach((title, i) => batch.set(db.collection('columns').doc(), { title, order: i, createdAt: FS.serverTimestamp(), createdBy: 'System' }));
+    await batch.commit();
+  }
+
+  unsubMilestones = db.collection('milestones').orderBy('order').onSnapshot(s => {
+    milestones = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    refreshMilestoneUI(); renderBoard(); updateMilestoneProgress();
+  });
+  unsubColumns = db.collection('columns').orderBy('order').onSnapshot(s => {
+    columns = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    doneColumnId = columns.find(c => c.title.toLowerCase() === 'erledigt')?.id || null;
+    renderBoard();
+  });
+  unsubCards = db.collection('cards').orderBy('order').onSnapshot(s => {
+    cards = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderBoard(); updateMilestoneProgress();
+  });
+  if (isAdmin) {
+    unsubActivity = db.collection('activity').orderBy('timestamp','desc').limit(80).onSnapshot(s =>
+      renderActivity(s.docs.map(d => ({ id: d.id, ...d.data() })))
+    );
+  }
+}
+
+// ── Filters ──
+function setFilter(f) {
+  activeFilter = (activeFilter === f) ? null : f;
+  ['f-all','f-mine','f-today','f-high'].forEach(id => document.getElementById(id).classList.remove('active'));
+  document.getElementById(activeFilter ? 'f-' + activeFilter : 'f-all').classList.add('active');
+  renderBoard();
+}
+
+function cardPassesFilter(card) {
+  if (activeMilestoneId && card.milestone !== activeMilestoneId) return false;
+  if (!activeFilter) return true;
+  if (activeFilter === 'mine') return card.assignedTo === currentUser || card.createdBy === currentUser;
+  if (activeFilter === 'high') return card.priority === 'hoch';
+  if (activeFilter === 'today') {
+    if (!card.dueDate) return false;
+    const t = new Date(); t.setHours(0,0,0,0);
+    const d = new Date(card.dueDate); d.setHours(0,0,0,0);
+    return d.getTime() === t.getTime();
+  }
+  return true;
+}
+
+// ── Milestone UI ──
+function onMilestoneSelectChange() {
+  activeMilestoneId = document.getElementById('milestone-select').value;
+  updateMilestoneProgress(); renderBoard();
+}
+
+function refreshMilestoneUI() {
+  // Sub-header select
+  const sel = document.getElementById('milestone-select');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">– Alle –</option>';
+  milestones.forEach(m => { const o = document.createElement('option'); o.value = m.id; o.textContent = m.title; sel.appendChild(o); });
+  if (cur) sel.value = cur;
+
+  // Card modal select
+  const csel = document.getElementById('card-milestone-input');
+  const ccur = csel.value;
+  csel.innerHTML = '<option value="">– Keiner –</option>';
+  milestones.forEach(m => { const o = document.createElement('option'); o.value = m.id; o.textContent = m.title; csel.appendChild(o); });
+  if (ccur) csel.value = ccur;
+
+  // Milestone modal list
+  const list = document.getElementById('ms-list');
+  if (!milestones.length) { list.innerHTML = '<div style="color:var(--text-muted);font-size:12px;">Noch keine Milestones erstellt.</div>'; return; }
+  list.innerHTML = '';
+  milestones.forEach(m => {
+    const total = cards.filter(c => c.milestone === m.id).length;
+    const done = cards.filter(c => c.milestone === m.id && c.columnId === doneColumnId).length;
+    const pct = total ? Math.round(done/total*100) : 0;
+    const el = document.createElement('div');
+    el.className = 'ms-list-item';
+    el.innerHTML = `
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:600;margin-bottom:3px;">${escHtml(m.title)}${m.targetDate?` <span style="font-family:var(--mono);font-size:9px;color:var(--text-muted);font-weight:400;">${m.targetDate}</span>`:''}</div>
+        <div style="display:flex;align-items:center;gap:7px;">
+          <div style="flex:1;height:3px;background:var(--surface3);border-radius:2px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:var(--purple);border-radius:2px;"></div></div>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--purple);">${done}/${total}</span>
+        </div>
+      </div>
+      <button class="ms-del-btn" onclick="deleteMilestone('${m.id}')">✕</button>
+    `;
+    list.appendChild(el);
+  });
+}
+
+function updateMilestoneProgress() {
+  const wrap = document.getElementById('ms-progress-wrap');
+  if (!activeMilestoneId || !doneColumnId) { wrap.style.display = 'none'; return; }
+  const total = cards.filter(c => c.milestone === activeMilestoneId).length;
+  const done  = cards.filter(c => c.milestone === activeMilestoneId && c.columnId === doneColumnId).length;
+  const pct = total > 0 ? Math.round(done/total*100) : 0;
+  wrap.style.display = 'flex';
+  document.getElementById('ms-progress-fill').style.width = pct + '%';
+  document.getElementById('ms-progress-label').textContent = `${done}/${total} · ${pct}%`;
+}
+
+// ── Render Board ──
+function renderBoard() {
+  const board = document.getElementById('board');
+  const addBtn = document.getElementById('add-column-btn');
+  board.querySelectorAll('.column').forEach(el => el.remove());
+
+  columns.forEach((col, idx) => {
+    const colCards = cards.filter(c => c.columnId === col.id);
+    const visCount = colCards.filter(c => cardPassesFilter(c)).length;
+    const colEl = document.createElement('div');
+    colEl.className = 'column'; colEl.dataset.colId = col.id;
+    colEl.innerHTML = `
+      <div class="col-header">
+        <div class="col-color ${COL_COLORS[idx % COL_COLORS.length]}"></div>
+        <div class="col-title">${escHtml(col.title)}</div>
+        <div class="col-count">${visCount}</div>
+        <button class="col-delete-btn" title="Löschen" data-col-id="${col.id}">✕</button>
+      </div>
+      <div class="col-cards" id="col-cards-${col.id}"><div class="col-drop-hint">Hierhin ziehen</div></div>
+      <div class="col-add-btn" data-col-id="${col.id}"><span style="font-size:14px">＋</span> Aufgabe</div>
+    `;
+    colEl.querySelector('.col-delete-btn').addEventListener('click', () => deleteColumn(col.id));
+    colEl.querySelector('.col-add-btn').addEventListener('click', () => openAddCardModal(col.id));
+    const cardsEl = colEl.querySelector('.col-cards');
+    cardsEl.addEventListener('dragover', e => onDragOver(e, col.id, colEl));
+    cardsEl.addEventListener('dragleave', e => onDragLeave(e, colEl));
+    cardsEl.addEventListener('drop', e => onDrop(e, col.id, colEl));
+    board.insertBefore(colEl, addBtn);
+    colCards.forEach(card => {
+      const el = createCardEl(card);
+      if (!cardPassesFilter(card)) el.classList.add('hidden-by-filter');
+      cardsEl.appendChild(el);
+    });
+  });
+}
+
+// ── Create Card Element ──
+function getDueInfo(dueDate) {
+  if (!dueDate) return { overdue: false, cls: '' };
+  const now = new Date(); now.setHours(0,0,0,0);
+  const due = new Date(dueDate); due.setHours(0,0,0,0);
+  if (due < now) return { overdue: true, cls: 'overdue-b' };
+  if (due.getTime() === now.getTime()) return { overdue: false, cls: 'today-b' };
+  return { overdue: false, cls: '' };
+}
+
+function createCardEl(card) {
+  const el = document.createElement('div');
+  el.dataset.cardId = card.id;
+  const canEdit = isAdmin || card.createdBy === currentUser;
+  const canDelete = isAdmin || card.createdBy === currentUser;
+  const authorCls = card.createdBy === 'Lähner' ? 'admin-b' : '';
+  const assigneeCls = card.assignedTo === 'Lähner' ? 'admin-b' : '';
+  const prio = card.priority || 'mittel';
+  const ms = card.milestone ? milestones.find(m => m.id === card.milestone) : null;
+  const dueInfo = getDueInfo(card.dueDate);
+
+  // Blocking check
+  const blocker = card.blockedBy ? cards.find(c => c.id === card.blockedBy) : null;
+  const isBlocked = blocker && blocker.columnId !== doneColumnId;
+
+  el.className = 'card' + (isBlocked ? ' blocked' : '') + (dueInfo.overdue ? ' overdue' : '');
+  el.draggable = !isBlocked;
+
+  el.innerHTML = `
+    <div class="card-actions">
+      ${canEdit ? `<button class="card-action-btn edit" title="Bearbeiten">✏</button>` : ''}
+      ${canDelete ? `<button class="card-action-btn del" title="Löschen">✕</button>` : ''}
+    </div>
+    <div class="card-title">${escHtml(card.title)}</div>
+    ${card.description ? `<div class="card-desc">${escHtml(card.description)}</div>` : ''}
+    ${isBlocked ? `<div class="card-blocked-hint">🚫 Blockiert von: <strong>${escHtml(blocker.title)}</strong></div>` : ''}
+    <div class="card-meta">
+      <span class="cbadge cb-author ${authorCls}">${escHtml(card.createdBy||'?')}</span>
+      ${card.assignedTo ? `<span class="cbadge cb-assignee ${assigneeCls}">→ ${escHtml(card.assignedTo)}</span>` : ''}
+      <span class="cbadge cb-prio-${prio}">${prio}</span>
+      ${ms ? `<span class="cbadge cb-milestone" title="${escHtml(ms.title)}">🎯 ${escHtml(ms.title)}</span>` : ''}
+      ${card.dueDate ? `<span class="cbadge cb-due ${dueInfo.cls}">📅 ${card.dueDate}</span>` : ''}
+    </div>
+  `;
+
+  if (canEdit) el.querySelector('.edit')?.addEventListener('click', e => { e.stopPropagation(); openEditCardModal(card.id); });
+  if (canDelete) el.querySelector('.del')?.addEventListener('click', e => { e.stopPropagation(); deleteCard(card.id); });
+
+  if (!isBlocked) {
+    el.addEventListener('dragstart', e => {
+      draggedCardId = card.id; e.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => el.classList.add('dragging'), 0);
+    });
+    el.addEventListener('dragend', () => {
+      el.classList.remove('dragging'); draggedCardId = null;
+      document.querySelectorAll('.column').forEach(c => c.classList.remove('drag-over'));
+    });
+  }
+  return el;
+}
+
+// ── Drag & Drop ──
+function onDragOver(e, colId, colEl) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; colEl.classList.add('drag-over'); }
+function onDragLeave(e, colEl) { if (!colEl.contains(e.relatedTarget)) colEl.classList.remove('drag-over'); }
+function onDrop(e, colId, colEl) {
+  e.preventDefault(); colEl.classList.remove('drag-over');
+  if (!draggedCardId) return;
+  const card = cards.find(c => c.id === draggedCardId);
+  if (!card || card.columnId === colId) return;
+  const oldTitle = columns.find(c => c.id === card.columnId)?.title || '?';
+  const newTitle = columns.find(c => c.id === colId)?.title || '?';
+  const upd = { columnId: colId, updatedAt: FS.serverTimestamp(), updatedBy: currentUser };
+  if (colId === doneColumnId) upd.completedAt = FS.serverTimestamp();
+  db.collection('cards').doc(draggedCardId).update(upd)
+    .then(() => { logActivity(`"${card.title}" → "${newTitle}"`); toast(`Verschoben → ${newTitle}`); })
+    .catch(err => toast(err.message, true));
+}
+
+// ── Card Modal ──
+function populateBlockedBySelect(excludeId) {
+  const sel = document.getElementById('card-blockedby-input');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">– Keine –</option>';
+  cards.filter(c => c.id !== excludeId).forEach(c => {
+    const o = document.createElement('option');
+    o.value = c.id;
+    o.textContent = `${c.title} [${columns.find(col => col.id === c.columnId)?.title||'?'}]`;
+    sel.appendChild(o);
+  });
+  sel.value = cur || '';
+}
+
+function openAddCardModal(colId) {
+  currentColumnId = colId; editingCardId = null;
+  document.getElementById('card-modal-title').textContent = 'Neue Aufgabe';
+  ['card-title-input','card-desc-input'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('card-priority-input').value = 'mittel';
+  document.getElementById('card-due-input').value = '';
+  document.getElementById('card-assignee-input').value = '';
+  document.getElementById('card-milestone-input').value = '';
+  populateBlockedBySelect(null);
+  document.getElementById('card-blockedby-input').value = '';
+  openModal('card-modal');
+  setTimeout(() => document.getElementById('card-title-input').focus(), 100);
+}
+
+function openEditCardModal(cardId) {
+  const card = cards.find(c => c.id === cardId);
+  if (!card) return;
+  if (!isAdmin && card.createdBy !== currentUser) { toast('Nur eigene Aufgaben können bearbeitet werden.', true); return; }
+  editingCardId = cardId; currentColumnId = card.columnId;
+  document.getElementById('card-modal-title').textContent = 'Aufgabe bearbeiten';
+  document.getElementById('card-title-input').value = card.title;
+  document.getElementById('card-desc-input').value = card.description || '';
+  document.getElementById('card-priority-input').value = card.priority || 'mittel';
+  document.getElementById('card-due-input').value = card.dueDate || '';
+  document.getElementById('card-assignee-input').value = card.assignedTo || '';
+  document.getElementById('card-milestone-input').value = card.milestone || '';
+  populateBlockedBySelect(cardId);
+  document.getElementById('card-blockedby-input').value = card.blockedBy || '';
+  openModal('card-modal');
+  setTimeout(() => document.getElementById('card-title-input').focus(), 100);
+}
+
+function saveCard() {
+  const title = document.getElementById('card-title-input').value.trim();
+  if (!title) { toast('Bitte einen Titel eingeben.', true); return; }
+  const data = {
+    title,
+    description: document.getElementById('card-desc-input').value.trim(),
+    priority: document.getElementById('card-priority-input').value,
+    dueDate: document.getElementById('card-due-input').value || null,
+    assignedTo: document.getElementById('card-assignee-input').value || null,
+    milestone: document.getElementById('card-milestone-input').value || null,
+    blockedBy: document.getElementById('card-blockedby-input').value || null,
+    columnId: currentColumnId
+  };
+  if (editingCardId) {
+    db.collection('cards').doc(editingCardId).update({ ...data, updatedAt: FS.serverTimestamp(), updatedBy: currentUser })
+      .then(() => { logActivity(`"${title}" bearbeitet`); toast('Aktualisiert ✓'); closeModal('card-modal'); })
+      .catch(e => toast(e.message, true));
+  } else {
+    db.collection('cards').add({ ...data, createdBy: currentUser, createdAt: FS.serverTimestamp(), order: cards.filter(c => c.columnId === currentColumnId).length })
+      .then(() => {
+        logActivity(`"${title}" in "${columns.find(c=>c.id===currentColumnId)?.title||''}" erstellt`);
+        toast('Erstellt ✓'); closeModal('card-modal');
+      }).catch(e => toast(e.message, true));
+  }
+}
+
+function deleteCard(cardId) {
+  const card = cards.find(c => c.id === cardId);
+  if (!card) return;
+  if (!isAdmin && card.createdBy !== currentUser) { toast('Nur eigene Aufgaben löschbar.', true); return; }
+  if (!confirm(`"${card.title}" löschen?`)) return;
+  db.collection('cards').doc(cardId).delete()
+    .then(() => { logActivity(`"${card.title}" gelöscht`); toast('Gelöscht'); })
+    .catch(e => toast(e.message, true));
+}
+
+// ── Column Modal ──
+function openAddColumnModal() {
+  document.getElementById('column-title-input').value = '';
+  openModal('column-modal');
+  setTimeout(() => document.getElementById('column-title-input').focus(), 100);
+}
+function saveColumn() {
+  const title = document.getElementById('column-title-input').value.trim();
+  if (!title) { toast('Bitte einen Namen eingeben.', true); return; }
+  db.collection('columns').add({ title, order: columns.length, createdAt: FS.serverTimestamp(), createdBy: currentUser })
+    .then(() => { logActivity(`Spalte "${title}" erstellt`); toast(`"${title}" erstellt ✓`); closeModal('column-modal'); })
+    .catch(e => toast(e.message, true));
+}
+function deleteColumn(colId) {
+  if (!isAdmin) { toast('Nur Admins können Spalten löschen.', true); return; }
+  const col = columns.find(c => c.id === colId);
+  if (!col) return;
+  const colCards = cards.filter(c => c.columnId === colId);
+  if (!confirm(colCards.length ? `Spalte "${col.title}" und ${colCards.length} Aufgaben löschen?` : `Spalte "${col.title}" löschen?`)) return;
+  const batch = db.batch();
+  colCards.forEach(c => batch.delete(db.collection('cards').doc(c.id)));
+  batch.delete(db.collection('columns').doc(colId));
+  batch.commit().then(() => { logActivity(`Spalte "${col.title}" gelöscht`); toast('Spalte gelöscht'); }).catch(e => toast(e.message, true));
+}
+
+// ── Milestone Modal ──
+function openMilestoneModal() {
+  document.getElementById('ms-title-input').value = '';
+  document.getElementById('ms-date-input').value = '';
+  refreshMilestoneUI();
+  openModal('milestone-modal');
+  setTimeout(() => document.getElementById('ms-title-input').focus(), 100);
+}
+function saveMilestone() {
+  const title = document.getElementById('ms-title-input').value.trim();
+  if (!title) { toast('Bitte Namen eingeben.', true); return; }
+  db.collection('milestones').add({ title, targetDate: document.getElementById('ms-date-input').value || null, order: milestones.length, createdAt: FS.serverTimestamp(), createdBy: currentUser })
+    .then(() => { logActivity(`Milestone "${title}" erstellt`); toast(`"${title}" erstellt ✓`); document.getElementById('ms-title-input').value = ''; document.getElementById('ms-date-input').value = ''; })
+    .catch(e => toast(e.message, true));
+}
+function deleteMilestone(id) {
+  const ms = milestones.find(m => m.id === id);
+  if (!ms || !confirm(`Milestone "${ms.title}" löschen?`)) return;
+  db.collection('milestones').doc(id).delete().then(() => { logActivity(`Milestone "${ms.title}" gelöscht`); toast('Gelöscht'); }).catch(e => toast(e.message, true));
+}
+
+// ── Weekly Export ──
+function exportWeeklyReport() {
+  if (!isAdmin) return;
+  const weekAgo = new Date(Date.now() - 7*24*60*60*1000);
+  const done = cards.filter(c => {
+    if (!c.completedAt) return false;
+    const ts = c.completedAt.toDate ? c.completedAt.toDate() : new Date(c.completedAt);
+    return ts >= weekAgo;
+  });
+  if (!done.length) { toast('Keine abgeschlossenen Aufgaben der letzten 7 Tage.', true); return; }
+
+  const byMs = {};
+  done.forEach(c => {
+    const key = c.milestone ? (milestones.find(m=>m.id===c.milestone)?.title||'Ohne Milestone') : 'Ohne Milestone';
+    if (!byMs[key]) byMs[key] = [];
+    byMs[key].push(c);
+  });
+
+  const now = new Date();
+  let md = `# LoopBoard – Wochenrückblick\n**Zeitraum:** ${weekAgo.toLocaleDateString('de-DE')} – ${now.toLocaleDateString('de-DE')}\n**Erledigt:** ${done.length} Aufgaben\n\n---\n\n`;
+  Object.entries(byMs).forEach(([ms, items]) => {
+    md += `## 🎯 ${ms}\n\n`;
+    items.forEach(c => {
+      md += `- **${c.title}**`;
+      if (c.assignedTo) md += ` *(${c.assignedTo})*`;
+      if (c.priority !== 'mittel') md += ` \`${c.priority}\``;
+      md += '\n';
+      if (c.description) md += `  > ${c.description.replace(/\n/g,'  \n  > ')}\n`;
+    });
+    md += '\n';
+  });
+  md += `---\n*Export: ${now.toLocaleString('de-DE')} · LoopFire Studio*\n`;
+
+  const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = Object.assign(document.createElement('a'), { href: url, download: `loopboard-${now.toISOString().slice(0,10)}.md` });
+  a.click(); URL.revokeObjectURL(url);
+  logActivity(`Wochenrückblick (${done.length} Aufgaben) exportiert`);
+  toast(`Export: ${done.length} Aufgaben ✓`);
+}
+
+// ── Activity ──
+function logActivity(text) {
+  db.collection('activity').add({ user: currentUser, text, timestamp: FS.serverTimestamp() }).catch(()=>{});
+}
+function renderActivity(items) {
+  const list = document.getElementById('activity-list');
+  document.getElementById('activity-count').textContent = items.length;
+  if (!items.length) { list.innerHTML = '<div class="activity-empty">Noch keine Aktivitäten</div>'; return; }
+  list.innerHTML = '';
+  items.forEach(item => {
+    const el = document.createElement('div');
+    const uc = item.user === 'Lähner' ? 'lahner' : 'tamme';
+    el.className = `activity-item ${uc}`;
+    el.innerHTML = `<div class="activity-user ${uc}">${escHtml(item.user||'?')}</div><div class="activity-text">${escHtml(item.text||'')}</div><div class="activity-time">${fmtDate(item.timestamp)}</div>`;
+    list.appendChild(el);
+  });
+}
+
+// ── Modals ──
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+document.querySelectorAll('.modal-overlay').forEach(ov =>
+  ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('active'); })
+);
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+  if (e.key === 'Enter') {
+    if (document.getElementById('card-modal').classList.contains('active') && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT') saveCard();
+    if (document.getElementById('column-modal').classList.contains('active')) saveColumn();
+    if (document.getElementById('milestone-modal').classList.contains('active') && e.target.id === 'ms-title-input') saveMilestone();
+  }
+});
+
+// ── Toast ──
+function toast(msg, isError=false) {
+  const t = document.createElement('div');
+  t.className = 'toast' + (isError?' error':''); t.textContent = msg;
+  document.getElementById('toast-container').appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(()=>t.remove(),300); }, 3000);
+}
+
+// ── Helpers ──
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDate(ts) {
+  if (!ts) return '';
+  try { const d = ts.toDate?ts.toDate():new Date(ts); return d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}); }
+  catch { return ''; }
+}
+</script>
+</body>
+</html>
