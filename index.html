@@ -257,8 +257,29 @@
     #theme-toggle { padding: 4px 10px; border-radius: var(--radius); font-family: var(--mono); font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text-muted); transition: all 0.2s; letter-spacing: 0.5px; }
     #theme-toggle:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
 
-    /* Milestone list in modal */
-    .ms-list-item { display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--border); }
+    /* ── PRIVATE CARDS (nur Lähner) ── */
+    .card.private-card {
+      border-color: var(--purple);
+      border-style: dashed;
+      background: linear-gradient(135deg, var(--surface2) 0%, rgba(197,134,192,0.06) 100%);
+    }
+    body.light .card.private-card {
+      background: linear-gradient(135deg, var(--surface2) 0%, rgba(107,63,160,0.05) 100%);
+    }
+    .card.private-card:hover { border-color: var(--purple); border-style: dashed; }
+    .cb-private {
+      background: var(--purple-dim); color: var(--purple);
+      font-family: var(--mono); font-size: 9px; letter-spacing: 0.5px;
+      padding: 2px 6px; border-radius: 3px; text-transform: uppercase;
+    }
+    .card-action-btn.privacy:hover { background: var(--purple-dim); color: var(--purple); }
+
+    /* Checkbox row in modal */
+    .form-check { display: flex; align-items: center; gap: 10px; padding: 9px 11px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: border-color 0.15s; user-select: none; }
+    .form-check:hover { border-color: var(--purple); }
+    .form-check input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--purple); cursor: pointer; flex-shrink: 0; }
+    .form-check-label { font-size: 13px; color: var(--text); cursor: pointer; }
+    .form-check-sub { font-family: var(--mono); font-size: 9px; color: var(--text-muted); margin-top: 1px; }
     .ms-list-item:last-child { border-bottom: none; }
     .ms-del-btn { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:11px; padding:2px 6px; border-radius:3px; transition:all 0.15s; }
     .ms-del-btn:hover { color:var(--admin); background:var(--admin-dim); }
@@ -398,6 +419,15 @@
       <select class="form-select" id="card-blockedby-input">
         <option value="">– Keine –</option>
       </select>
+    </div>
+    <div class="form-group" id="card-private-group" style="display:none;">
+      <label class="form-check" for="card-private-input">
+        <input type="checkbox" id="card-private-input">
+        <div>
+          <div class="form-check-label">🔒 Vor Tamme verbergen</div>
+          <div class="form-check-sub">Nur du siehst diese Aufgabe</div>
+        </div>
+      </label>
     </div>
     <div class="modal-actions">
       <button class="btn ghost" onclick="closeModal('card-modal')">Abbrechen</button>
@@ -590,6 +620,8 @@ function setFilter(f) {
 }
 
 function cardPassesFilter(card) {
+  // Hard filter: private cards invisible to Tamme
+  if (card.privateCard && !isAdmin) return false;
   if (activeMilestoneId && card.milestone !== activeMilestoneId) return false;
   if (!activeFilter) return true;
   if (activeFilter === 'mine') return card.assignedTo === currentUser || card.createdBy === currentUser;
@@ -720,11 +752,12 @@ function createCardEl(card) {
   const blocker = card.blockedBy ? cards.find(c => c.id === card.blockedBy) : null;
   const isBlocked = blocker && blocker.columnId !== doneColumnId;
 
-  el.className = 'card' + (isBlocked ? ' blocked' : '') + (dueInfo.overdue ? ' overdue' : '');
+  el.className = 'card' + (isBlocked ? ' blocked' : '') + (dueInfo.overdue ? ' overdue' : '') + (card.privateCard ? ' private-card' : '');
   el.draggable = !isBlocked;
 
   el.innerHTML = `
     <div class="card-actions">
+      ${isAdmin ? `<button class="card-action-btn privacy" title="${card.privateCard ? 'Sichtbar machen' : 'Vor Tamme verbergen'}">${card.privateCard ? '👁' : '🔒'}</button>` : ''}
       ${canEdit ? `<button class="card-action-btn edit" title="Bearbeiten">✏</button>` : ''}
       ${canDelete ? `<button class="card-action-btn del" title="Löschen">✕</button>` : ''}
     </div>
@@ -737,9 +770,11 @@ function createCardEl(card) {
       <span class="cbadge cb-prio-${prio}">${prio}</span>
       ${ms ? `<span class="cbadge cb-milestone" title="${escHtml(ms.title)}">🎯 ${escHtml(ms.title)}</span>` : ''}
       ${card.dueDate ? `<span class="cbadge cb-due ${dueInfo.cls}">📅 ${card.dueDate}</span>` : ''}
+      ${card.privateCard ? `<span class="cbadge cb-private">🔒 Privat</span>` : ''}
     </div>
   `;
 
+  if (isAdmin) el.querySelector('.privacy')?.addEventListener('click', e => { e.stopPropagation(); togglePrivate(card.id, card.privateCard); });
   if (canEdit) el.querySelector('.edit')?.addEventListener('click', e => { e.stopPropagation(); openEditCardModal(card.id); });
   if (canDelete) el.querySelector('.del')?.addEventListener('click', e => { e.stopPropagation(); deleteCard(card.id); });
 
@@ -773,6 +808,19 @@ function onDrop(e, colId, colEl) {
     .catch(err => toast(err.message, true));
 }
 
+// ── Quick-toggle private ──
+function togglePrivate(cardId, currentState) {
+  const card = cards.find(c => c.id === cardId);
+  if (!card || !isAdmin) return;
+  const newState = !currentState;
+  db.collection('cards').doc(cardId).update({ privateCard: newState, updatedAt: FS.serverTimestamp(), updatedBy: currentUser })
+    .then(() => {
+      logActivity(`"${card.title}" ${newState ? 'vor Tamme verborgen' : 'wieder sichtbar gemacht'}`);
+      toast(newState ? '🔒 Karte versteckt' : '👁 Karte sichtbar');
+    })
+    .catch(e => toast(e.message, true));
+}
+
 // ── Card Modal ──
 function populateBlockedBySelect(excludeId) {
   const sel = document.getElementById('card-blockedby-input');
@@ -797,6 +845,10 @@ function openAddCardModal(colId) {
   document.getElementById('card-milestone-input').value = '';
   populateBlockedBySelect(null);
   document.getElementById('card-blockedby-input').value = '';
+  // Private checkbox: only show for admin
+  const pg = document.getElementById('card-private-group');
+  pg.style.display = isAdmin ? 'block' : 'none';
+  document.getElementById('card-private-input').checked = false;
   openModal('card-modal');
   setTimeout(() => document.getElementById('card-title-input').focus(), 100);
 }
@@ -815,6 +867,10 @@ function openEditCardModal(cardId) {
   document.getElementById('card-milestone-input').value = card.milestone || '';
   populateBlockedBySelect(cardId);
   document.getElementById('card-blockedby-input').value = card.blockedBy || '';
+  // Private checkbox: only show for admin
+  const pg = document.getElementById('card-private-group');
+  pg.style.display = isAdmin ? 'block' : 'none';
+  document.getElementById('card-private-input').checked = !!card.privateCard;
   openModal('card-modal');
   setTimeout(() => document.getElementById('card-title-input').focus(), 100);
 }
@@ -830,6 +886,7 @@ function saveCard() {
     assignedTo: document.getElementById('card-assignee-input').value || null,
     milestone: document.getElementById('card-milestone-input').value || null,
     blockedBy: document.getElementById('card-blockedby-input').value || null,
+    privateCard: isAdmin ? document.getElementById('card-private-input').checked : false,
     columnId: currentColumnId
   };
   if (editingCardId) {
