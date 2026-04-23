@@ -9,7 +9,7 @@
   <title>Meine Rezepte</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
   <style>
     /* ===== VARIABLES ===== */
     :root {
@@ -41,7 +41,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; overflow: hidden; }
     body {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Open Sans', sans-serif;
       background: var(--bg);
       color: var(--text);
       -webkit-tap-highlight-color: transparent;
@@ -68,8 +68,8 @@
     }
     #hdr-title {
       flex: 1;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 21px; font-weight: 600;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 18px; font-weight: 700;
       color: var(--text); letter-spacing: -0.2px;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
@@ -190,8 +190,8 @@
     .rcard:active { transform: scale(.975); box-shadow: none; }
     .rcard-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
     .rcard-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 21px; font-weight: 600; color: var(--text); line-height: 1.2; flex: 1;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 16px; font-weight: 700; color: var(--text); line-height: 1.3; flex: 1;
     }
     .stars { display: flex; gap: 2px; flex-shrink: 0; }
     .star { color: var(--star-empty); }
@@ -223,8 +223,8 @@
     }
     .empty-icon { font-size: 62px; animation: float 3s ease-in-out infinite; }
     .empty-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 26px; font-weight: 600; color: var(--text);
+      font-family: 'Open Sans', sans-serif;
+      font-size: 22px; font-weight: 700; color: var(--text);
     }
     .empty-sub { font-size: 15px; color: var(--text-muted); line-height: 1.5; }
     .btn-primary {
@@ -243,9 +243,9 @@
       border-bottom: 1px solid var(--border);
     }
     .det-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 30px; font-weight: 700; color: var(--text);
-      line-height: 1.2; margin-bottom: 12px;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 24px; font-weight: 800; color: var(--text);
+      line-height: 1.25; margin-bottom: 12px;
     }
     .det-stars { display: flex; gap: 7px; margin-bottom: 14px; }
     .det-stars .star { font-size: 26px; cursor: pointer; transition: transform .15s; }
@@ -261,9 +261,10 @@
     .det-tags { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 18px; border-bottom: 1px solid var(--border); }
     .det-section { padding: 20px 18px; border-bottom: 1px solid var(--border); }
     .sec-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 20px; font-weight: 600; color: var(--text);
+      font-family: 'Open Sans', sans-serif;
+      font-size: 15px; font-weight: 700; color: var(--text);
       margin-bottom: 14px; display: flex; align-items: center; gap: 7px;
+      text-transform: uppercase; letter-spacing: .4px;
     }
 
     /* Ingredients */
@@ -317,11 +318,11 @@
     .btn-del:active { transform: scale(.97); background: #ffeaea; }
 
     /* ===== FORM SCREEN ===== */
-    .form-wrap { padding: 18px; display: flex; flex-direction: column; gap: 22px; padding-bottom: 40px; }
-    .fgroup { display: flex; flex-direction: column; gap: 7px; }
-    .flabel { font-size: 12px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .6px; }
+    .form-wrap { padding: 14px; display: flex; flex-direction: column; gap: 18px; padding-bottom: 40px; }
+    .fgroup { display: flex; flex-direction: column; gap: 6px; }
+    .flabel { font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .7px; }
     .finput, .fselect, .ftextarea {
-      width: 100%; padding: 13px 15px;
+      width: 100%; padding: 12px 14px;
       background: var(--surface); border: 1.5px solid var(--border);
       border-radius: var(--r-sm);
       font-size: 15px; color: var(--text); outline: none;
@@ -329,25 +330,25 @@
       -webkit-appearance: none; appearance: none;
     }
     .finput:focus, .fselect:focus, .ftextarea:focus { border-color: var(--accent); }
-    .ftextarea { resize: none; min-height: 96px; line-height: 1.55; }
+    .ftextarea { resize: none; min-height: 88px; line-height: 1.55; }
     .fselect {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239089b5' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
       background-repeat: no-repeat; background-position: right 14px center; padding-right: 38px;
     }
 
     /* Star selector */
-    .star-sel { display: flex; gap: 6px; }
+    .star-sel { display: flex; gap: 4px; }
     .star-sel-btn {
-      font-size: 34px; background: none; border: none;
-      cursor: pointer; color: var(--star-empty); transition: all .15s; padding: 0; line-height: 1;
+      font-size: 36px; background: none; border: none;
+      cursor: pointer; color: var(--star-empty); transition: all .15s; padding: 2px; line-height: 1;
     }
     .star-sel-btn.on { color: var(--star); }
     .star-sel-btn:active { transform: scale(1.3); }
 
     /* Time grid */
-    .times-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .times-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .tfield { display: flex; flex-direction: column; gap: 5px; }
-    .tfield-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+    .tfield-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
     .tfield-row {
       display: flex; align-items: center;
       border: 1.5px solid var(--border); border-radius: var(--r-sm);
@@ -356,36 +357,42 @@
     }
     .tfield-row:focus-within { border-color: var(--accent); }
     .tfield-row input {
-      flex: 1; padding: 12px 8px 12px 12px;
+      flex: 1; padding: 11px 6px 11px 10px;
       border: none; background: transparent;
-      font-size: 17px; font-weight: 700; color: var(--accent);
+      font-size: 16px; font-weight: 700; color: var(--accent);
       outline: none; text-align: right; min-width: 0;
     }
-    .tfield-unit { padding-right: 12px; font-size: 12px; color: var(--text-muted); }
+    .tfield-unit { padding-right: 10px; font-size: 12px; color: var(--text-muted); }
 
-    /* Ingredients list in form */
-    .ings-list { display: flex; flex-direction: column; gap: 9px; }
-    .ing-row {
-      display: flex; align-items: center; gap: 7px;
-      animation: fadeUp .2s ease both;
+    /* ── Ingredients – simple text lines ── */
+    .ings-list { display: flex; flex-direction: column; gap: 0; border: 1.5px solid var(--border); border-radius: var(--r-sm); overflow: hidden; background: var(--surface); }
+    .ing-line {
+      display: flex; align-items: center;
+      border-bottom: 1px solid var(--border);
+      animation: fadeUp .18s ease both;
     }
-    .ing-row-amount { width: 68px; flex-shrink: 0; }
-    .ing-row-unit { width: 86px; flex-shrink: 0; }
-    .ing-row-name { flex: 1; }
-    .ing-row input, .ing-row select {
-      width: 100%; padding: 11px 10px;
-      background: var(--surface); border: 1.5px solid var(--border);
-      border-radius: var(--r-sm); font-size: 14px; color: var(--text);
-      outline: none; transition: border-color .2s;
-      -webkit-appearance: none; appearance: none;
+    .ing-line:last-child { border-bottom: none; }
+    .ing-line-num {
+      width: 32px; flex-shrink: 0; text-align: center;
+      font-size: 12px; font-weight: 700; color: var(--accent-soft);
+      padding-left: 2px;
     }
-    .ing-row select {
-      padding-right: 22px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239089b5' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: right 8px center;
-      font-size: 13px;
+    .ing-line input {
+      flex: 1; padding: 13px 10px 13px 4px;
+      border: none; background: transparent;
+      font-size: 15px; color: var(--text); outline: none;
     }
-    .ing-row input:focus, .ing-row select:focus { border-color: var(--accent); }
+    .ing-line input::placeholder { color: var(--text-muted); }
+    .ing-line input:focus { background: #faf8ff; }
+    .ing-line-rm {
+      width: 40px; height: 44px; flex-shrink: 0;
+      background: transparent; border: none; border-left: 1px solid var(--border);
+      color: var(--text-muted); font-size: 18px; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all .15s;
+    }
+    .ing-line-rm:active { background: #ffeaea; color: var(--red); }
+
     .btn-rm {
       width: 34px; height: 34px; flex-shrink: 0;
       background: transparent; border: 1.5px solid var(--border);
@@ -396,12 +403,12 @@
     }
     .btn-rm:active { background: #ffeaea; border-color: var(--red); color: var(--red); }
     .btn-add-row {
-      display: flex; align-items: center; gap: 8px;
-      padding: 12px 16px;
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      padding: 11px 16px;
       background: var(--surface3); border: 1.5px dashed var(--accent-soft);
       border-radius: var(--r-sm); color: var(--accent);
-      font-size: 14px; font-weight: 500; cursor: pointer;
-      width: 100%; transition: all .2s; margin-top: 4px;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      width: 100%; transition: all .2s; margin-top: 6px;
     }
     .btn-add-row:active { background: var(--accent-soft); }
 
@@ -464,8 +471,9 @@
     }
     .add-cat-row button:active { transform: scale(.92); background: var(--accent-dark); }
     .cat-sec-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 20px; font-weight: 600; color: var(--text); margin-bottom: 12px;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 13px; font-weight: 700; color: var(--text2); margin-bottom: 12px;
+      text-transform: uppercase; letter-spacing: .5px;
     }
     .cat-list { display: flex; flex-direction: column; gap: 9px; }
     .cat-item {
@@ -513,8 +521,8 @@
     }
     #overlay.show .dialog { transform: none; }
     .dialog-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 7px;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 7px;
     }
     .dialog-msg { font-size: 15px; color: var(--text-muted); line-height: 1.55; margin-bottom: 22px; }
     .dialog-acts { display: flex; gap: 11px; }
@@ -556,6 +564,50 @@
 
     /* ===== MISC ===== */
     .divider { height: 1px; background: var(--border); margin: 2px 0; }
+
+    /* ===== RECIPE ICON ===== */
+    .rcard-icon {
+      font-size: 38px; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      width: 56px; height: 56px; flex-shrink: 0;
+      background: var(--surface2); border-radius: 14px;
+      margin-bottom: 12px;
+    }
+    .det-icon {
+      font-size: 52px; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      width: 72px; height: 72px;
+      background: rgba(255,255,255,.7); border-radius: 18px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 12px rgba(124,107,191,.1);
+    }
+
+    /* Icon picker in form */
+    .icon-picker-wrap {
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .icon-selected-preview {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .icon-preview-big {
+      font-size: 40px; line-height: 1;
+      width: 60px; height: 60px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--surface2); border-radius: 14px; flex-shrink: 0;
+    }
+    .icon-grid {
+      display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px;
+    }
+    .icon-btn {
+      aspect-ratio: 1; border: 2px solid transparent;
+      background: var(--bg); border-radius: 10px;
+      font-size: 22px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all .15s; padding: 0;
+    }
+    .icon-btn:active { transform: scale(.88); }
+    .icon-btn.selected {
+      border-color: var(--accent); background: var(--accent-soft);
+    }
   </style>
 </head>
 <body>
@@ -672,9 +724,19 @@ const S = {
   fSteps:       [],
   fTags:        [],
   fRating:      0,
+  fIcon:        '🍳',
 };
 
-const UNITS = ['g','kg','ml','l','EL','TL','Stück','Prise','Pkg.','Dose','nach Geschm.',''];
+const ICONS = [
+  '🍳','🥘','🍲','🫕','🥗','🍝','🍜','🍛',
+  '🍕','🥙','🌮','🫔','🥪','🍱','🥩','🍗',
+  '🐟','🦐','🥓','🍖','🥞','🧇','🥚','🧆',
+  '🍞','🥐','🥖','🫓','🧀','🍰','🎂','🧁',
+  '🍪','🍩','🍮','🫐','🍓','🍑','🍋','🥕',
+  '🧄','🥦','🥑','🫚','🥣','🍵','☕','🧋',
+];
+
+
 
 /* =============================================
    FIREBASE LISTENERS
@@ -811,6 +873,7 @@ function renderList() {
     div.className = 'rcard';
     div.style.animationDelay = `${i * 0.045}s`;
     div.innerHTML = `
+      <div class="rcard-icon">${esc(r.icon||'🍳')}</div>
       <div class="rcard-top">
         <div class="rcard-name">${esc(r.name||'Ohne Namen')}</div>
         <div class="stars">${starsHtml(r.rating||0, 14)}</div>
@@ -869,6 +932,7 @@ function renderDetail(id) {
 
   screen.innerHTML = `
     <div class="det-hero">
+      <div class="det-icon">${esc(r.icon||'🍳')}</div>
       <div class="det-name">${esc(r.name||'Ohne Namen')}</div>
       <div class="det-stars" id="det-stars">
         ${[1,2,3,4,5].map(n=>`<span class="star ${(r.rating||0)>=n?'on':''}" data-n="${n}">★</span>`).join('')}
@@ -890,13 +954,10 @@ function renderDetail(id) {
       <div class="det-section">
         <div class="sec-title">🛒 Zutaten</div>
         <div id="ing-list">
-          ${ings.map((ing,i) => `
-            <div class="ing-item" data-i="${i}">
-              <div class="ing-check"></div>
-              <span class="ing-amount">${esc(ing.amount||'')}${ing.unit?' '+esc(ing.unit):''}</span>
-              <span class="ing-name">${esc(ing.name||'')}</span>
-            </div>
-          `).join('')}
+          ${ings.map((ing,i) => {
+            const txt = typeof ing === 'string' ? ing : [ing.amount, ing.unit, ing.name].filter(Boolean).join(' ');
+            return `<div class="ing-item" data-i="${i}"><div class="ing-check"></div><span class="ing-name" style="flex:1">${esc(txt)}</span></div>`;
+          }).join('')}
         </div>
       </div>` : ''}
 
@@ -954,10 +1015,14 @@ async function rateRecipe(id, n) {
 ============================================= */
 function renderForm(editId) {
   const r = editId ? (S.recipes[editId] || {}) : {};
-  S.fIngredients = (r.ingredients?.length ? r.ingredients.map(i=>({...i})) : [{amount:'',unit:'',name:''}]);
+  // Support both old object format {amount,unit,name} and new plain string format
+  S.fIngredients = r.ingredients?.length
+    ? r.ingredients.map(i => typeof i === 'string' ? i : [i.amount, i.unit, i.name].filter(Boolean).join(' '))
+    : [''];
   S.fSteps       = (r.steps?.length ? [...r.steps] : ['']);
   S.fTags        = [...(r.tags||[])];
   S.fRating      = r.rating || 0;
+  S.fIcon        = r.icon || '🍳';
 
   const catOpts = Object.values(S.cats).map(c =>
     `<option value="${esc(c.name)}" ${r.category===c.name?'selected':''}>${esc(c.name)}</option>`
@@ -968,6 +1033,19 @@ function renderForm(editId) {
       <div class="fgroup">
         <label class="flabel">Rezeptname *</label>
         <input class="finput" id="f-name" type="text" placeholder="z.B. Omas Apfelkuchen" value="${escAttr(r.name||'')}" autocomplete="off" autocorrect="off">
+      </div>
+
+      <div class="fgroup">
+        <label class="flabel">Icon</label>
+        <div class="icon-picker-wrap">
+          <div class="icon-selected-preview">
+            <div class="icon-preview-big" id="icon-preview">${S.fIcon}</div>
+            <span style="font-size:13px;color:var(--text-muted);line-height:1.4">Wähle ein passendes<br>Icon für dein Rezept</span>
+          </div>
+          <div class="icon-grid" id="icon-grid">
+            ${ICONS.map(ic => `<button type="button" class="icon-btn${S.fIcon===ic?' selected':''}" data-icon="${ic}">${ic}</button>`).join('')}
+          </div>
+        </div>
       </div>
 
       <div class="fgroup">
@@ -1032,6 +1110,15 @@ function renderForm(editId) {
     </div>
   `;
 
+  // Icon picker
+  document.querySelectorAll('#icon-grid .icon-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      S.fIcon = btn.dataset.icon;
+      document.getElementById('icon-preview').textContent = S.fIcon;
+      document.querySelectorAll('#icon-grid .icon-btn').forEach(b => b.classList.toggle('selected', b === btn));
+    });
+  });
+
   // Star selector
   document.querySelectorAll('#star-sel .star-sel-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1060,7 +1147,7 @@ function renderForm(editId) {
   buildIngsUI();
   buildStepsUI();
 
-  document.getElementById('add-ing-btn').addEventListener('click', () => { S.fIngredients.push({amount:'',unit:'',name:''}); buildIngsUI(); });
+  document.getElementById('add-ing-btn').addEventListener('click', () => { S.fIngredients.push(''); buildIngsUI(); const inputs = document.querySelectorAll('.ing-line input'); if(inputs.length) inputs[inputs.length-1].focus(); });
   document.getElementById('add-step-btn').addEventListener('click', () => { S.fSteps.push(''); buildStepsUI(); });
 }
 
@@ -1104,22 +1191,52 @@ function buildIngsUI() {
   list.innerHTML = '';
   S.fIngredients.forEach((ing, i) => {
     const row = document.createElement('div');
-    row.className = 'ing-row';
-    row.innerHTML = `
-      <input class="ing-row-amount" type="text" placeholder="Menge" value="${escAttr(ing.amount||'')}" autocomplete="off">
-      <select class="ing-row-unit">
-        ${UNITS.map(u=>`<option value="${u}" ${ing.unit===u?'selected':''}>${u||'–'}</option>`).join('')}
-      </select>
-      <input class="ing-row-name" type="text" placeholder="Zutat" value="${escAttr(ing.name||'')}" autocomplete="off" autocorrect="off">
-      <button type="button" class="btn-rm">×</button>
-    `;
-    row.querySelector('.ing-row-amount').addEventListener('input', e => S.fIngredients[i].amount = e.target.value);
-    row.querySelector('.ing-row-unit').addEventListener('change', e => S.fIngredients[i].unit = e.target.value);
-    row.querySelector('.ing-row-name').addEventListener('input', e => S.fIngredients[i].name = e.target.value);
-    row.querySelector('.btn-rm').addEventListener('click', () => {
-      if (S.fIngredients.length <= 1) { toast('Mindestens eine Zutat'); return; }
-      S.fIngredients.splice(i,1); buildIngsUI();
+    row.className = 'ing-line';
+    row.style.animationDelay = `${i * 0.03}s`;
+
+    const num = document.createElement('span');
+    num.className = 'ing-line-num';
+    num.textContent = i + 1;
+
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.placeholder = i === 0 ? 'z.B. 200g Mehl' : i === 1 ? 'z.B. 3 Eier' : `Zutat ${i + 1}`;
+    inp.value = ing;
+    inp.autocomplete = 'off';
+    inp.autocorrect = 'off';
+    inp.addEventListener('input', e => { S.fIngredients[i] = e.target.value; num.textContent = i + 1; });
+    // Enter-key adds next line
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        S.fIngredients.splice(i + 1, 0, '');
+        buildIngsUI();
+        // Focus next input
+        const all = document.querySelectorAll('.ing-line input');
+        if (all[i + 1]) all[i + 1].focus();
+      } else if (e.key === 'Backspace' && inp.value === '' && S.fIngredients.length > 1) {
+        e.preventDefault();
+        S.fIngredients.splice(i, 1);
+        buildIngsUI();
+        const all = document.querySelectorAll('.ing-line input');
+        if (all[Math.max(0, i - 1)]) all[Math.max(0, i - 1)].focus();
+      }
     });
+
+    const rm = document.createElement('button');
+    rm.type = 'button';
+    rm.className = 'ing-line-rm';
+    rm.innerHTML = '×';
+    rm.setAttribute('aria-label', 'Entfernen');
+    rm.addEventListener('click', () => {
+      if (S.fIngredients.length <= 1) { S.fIngredients[0] = ''; buildIngsUI(); return; }
+      S.fIngredients.splice(i, 1);
+      buildIngsUI();
+    });
+
+    row.appendChild(num);
+    row.appendChild(inp);
+    row.appendChild(rm);
     list.appendChild(row);
   });
 }
@@ -1173,11 +1290,12 @@ async function submitForm() {
     if (!S.fTags.includes(v)) S.fTags.push(v);
   }
 
-  const ings = S.fIngredients.filter(i => i.name?.trim());
+  const ings  = S.fIngredients.filter(s => s?.trim());
   const steps = S.fSteps.filter(s => s?.trim());
 
   const data = {
     name,
+    icon:     S.fIcon,
     category: document.getElementById('f-cat')?.value || '',
     rating:   S.fRating,
     prepTime: parseInt(document.getElementById('f-prep')?.value)||0,
