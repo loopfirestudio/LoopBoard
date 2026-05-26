@@ -581,7 +581,12 @@ html, body {
       </div>
       <div class="field-row">
         <label>🔗 Download-URL *</label>
-        <input id="dl-url" class="win-input dl-focus" type="url" placeholder="https://example.com/game-v1.0.zip">
+        <input id="dl-url" class="win-input dl-focus" type="url"
+          placeholder="https://example.com/game-v1.0.zip  oder Google Drive Share-Link…"
+          oninput="convertDriveUrl(this)">
+        <span id="dl-url-hint" style="font-size:11px;color:var(--green);display:none;">
+          ✅ Google Drive-Link automatisch in Direkt-Link umgewandelt
+        </span>
       </div>
       <div class="field-row">
         <label>🏷 Bezeichnung</label>
@@ -714,12 +719,16 @@ function makeClEntry(item) {
       <span class="cl-version">${esc(item.version||'—')}</span>
       <span class="cl-title-text">${esc(item.title||'')}</span>
       <span class="cl-date">${date}</span>
-      <button class="cl-delete-btn" title="Löschen" onclick="askDelete('${item.id}','changelog',${JSON.stringify(esc(item.title||'?'))})">🗑</button>
+      <button class="cl-delete-btn" title="Löschen">🗑</button>
     </div>
     <div class="cl-body">
       ${item.description ? `<div class="cl-description">${esc(item.description)}</div>` : ''}
       ${changesHtml}
     </div>`;
+  div.querySelector('.cl-delete-btn').addEventListener('click', e => {
+    e.stopPropagation();
+    askDelete(item.id, 'changelog', item.title || '?');
+  });
   return div;
 }
 
@@ -754,18 +763,26 @@ function makeDlCard(item) {
       <span class="dl-platform-icon">${icon}</span>
       <span class="dl-platform-name">${esc(item.platform||'Sonstiges')}</span>
       <span class="dl-version-badge">${esc(item.version||'—')}</span>
-      <button class="dl-delete-btn" title="Löschen" onclick="askDelete('${item.id}','download',${JSON.stringify(esc(item.platform||'?'))})">🗑</button>
+      <button class="dl-delete-btn" title="Löschen">🗑</button>
     </div>
     <div class="dl-card-body">
       ${item.label ? `<div class="dl-label">${esc(item.label)}</div>` : ''}
       <div class="dl-link-row">
         <a class="dl-link" href="${esc(item.url)}" target="_blank" rel="noopener" title="${esc(item.url)}">${esc(shortenUrl(item.url))}</a>
-        <button class="dl-copy-btn" onclick="copyUrl('${esc(item.url)}')">📋 Kopieren</button>
+        <button class="dl-copy-btn" data-url="${esc(item.url)}">📋 Kopieren</button>
       </div>
       <a class="dl-open-btn" href="${esc(item.url)}" target="_blank" rel="noopener">⬇️ Jetzt herunterladen</a>
       ${item.note ? `<div class="dl-note">ℹ️ ${esc(item.note)}</div>` : ''}
       <div class="dl-date">Hinzugefügt: ${date}</div>
     </div>`;
+  card.querySelector('.dl-delete-btn').addEventListener('click', e => {
+    e.stopPropagation();
+    askDelete(item.id, 'download', item.platform || '?');
+  });
+  card.querySelector('.dl-copy-btn').addEventListener('click', e => {
+    e.stopPropagation();
+    copyUrl(item.url);
+  });
   return card;
 }
 
@@ -855,13 +872,13 @@ window.submitDownload = async () => {
 };
 
 // ── Delete ──
-window.askDelete = (id, kind, title) => {
+function askDelete(id, kind, title) {
   pendingDeleteId = id;
   const label = kind === 'changelog' ? `Changelog "${title}"` : `Download für "${title}"`;
   document.getElementById('confirm-msg').textContent =
     `Möchtest du den ${label} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`;
   document.getElementById('confirm-dialog').classList.add('open');
-};
+}
 window.cancelDelete = () => {
   pendingDeleteId = null;
   document.getElementById('confirm-dialog').classList.remove('open');
@@ -899,6 +916,20 @@ document.addEventListener('keydown', e => {
     ['cl-dialog','dl-dialog','confirm-dialog'].forEach(id => document.getElementById(id).classList.remove('open'));
   }
 });
+
+// ── Google Drive URL converter ──
+window.convertDriveUrl = (input) => {
+  const val  = input.value.trim();
+  const hint = document.getElementById('dl-url-hint');
+  // Match both /file/d/ID/view and /open?id=ID formats
+  const match = val.match(/drive\.google\.com\/(?:file\/d\/|open\?id=)([\w-]+)/);
+  if (match) {
+    input.value = `https://drive.google.com/uc?export=download&id=${match[1]}`;
+    hint.style.display = 'block';
+  } else {
+    hint.style.display = 'none';
+  }
+};
 
 // ── Helpers ──
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
