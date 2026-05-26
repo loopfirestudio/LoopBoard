@@ -10,24 +10,26 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:         #1a1f2e;
-  --surface:    #242938;
-  --surface2:   #2e3347;
-  --border:     #3a4060;
-  --border-lit: #4a5280;
-  --accent:     #4f8ef7;
-  --accent2:    #7c5cfc;
-  --accent-dim: #2a4a8a;
-  --green:      #3dd68c;
-  --red:        #f75f5f;
-  --yellow:     #f7c94f;
-  --text:       #e8eaf0;
-  --text-dim:   #8b92b0;
-  --text-muted: #555e7a;
-  --win-bar1:   #1e2438;
-  --win-bar2:   #262d42;
-  --radius:     6px;
-  --radius-lg:  10px;
+  /* ── Light Ocher Theme ── */
+  --bg:          #f2ead8;
+  --surface:     #faf4e6;
+  --surface2:    #ede4cc;
+  --border:      #cfc4a0;
+  --border-lit:  #b0a070;
+  --accent:      #7a5c28;
+  --accent-lit:  #9b7535;
+  --accent-dim:  #e8dbbf;
+  --green:       #3a7d44;
+  --red:         #c0392b;
+  --red-dim:     #fde8e6;
+  --yellow:      #c8860a;
+  --text:        #2b2520;
+  --text-dim:    #4a4035;
+  --text-muted:  #8a7d65;
+  --win-bar1:    #e8dfc8;
+  --win-bar2:    #ede5cf;
+  --radius:      6px;
+  --radius-lg:   10px;
 }
 
 html, body {
@@ -41,14 +43,14 @@ html, body {
   overflow: hidden;
 }
 
-/* ─── TITLEBAR (Windows chrome) ─── */
+/* ─── TITLEBAR ─── */
 #titlebar {
-  background: linear-gradient(90deg, #0d1117 0%, #1a2035 100%);
-  border-bottom: 1px solid var(--border);
-  height: 32px;
+  background: var(--accent);
+  border-bottom: 1px solid var(--border-lit);
+  height: 34px;
   display: flex;
   align-items: center;
-  padding: 0 12px;
+  padding: 0 14px;
   gap: 10px;
   flex-shrink: 0;
   user-select: none;
@@ -58,26 +60,25 @@ html, body {
   font-family: 'Ubuntu', sans-serif;
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-dim);
+  color: rgba(255,255,255,0.85);
   flex: 1;
   letter-spacing: 0.3px;
 }
-.tb-btns { display: flex; gap: 6px; margin-left: auto; }
+.tb-btns { display: flex; gap: 7px; margin-left: auto; }
 .tb-btn {
   width: 13px; height: 13px;
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
   font-size: 8px;
   font-weight: bold;
   color: transparent;
   transition: color 0.15s;
 }
-.tb-btn:hover { color: rgba(0,0,0,0.7); }
-.tb-btn.close  { background: #ff5f57; }
-.tb-btn.min    { background: #febc2e; }
-.tb-btn.max    { background: #28c840; }
+.tb-btn:hover { color: rgba(0,0,0,0.55); }
+.tb-btn.close { background: #ff5f57; }
+.tb-btn.min   { background: #febc2e; }
+.tb-btn.max   { background: #28c840; }
 
 /* ─── MENUBAR ─── */
 #menubar {
@@ -100,13 +101,13 @@ html, body {
   margin: 3px 2px;
   transition: background 0.1s, color 0.1s;
 }
-.menu-item:hover { background: var(--surface2); color: var(--text); }
+.menu-item:hover { background: var(--accent-dim); color: var(--accent); }
 
 /* ─── TOOLBAR ─── */
 #toolbar {
   background: var(--win-bar2);
   border-bottom: 1px solid var(--border);
-  padding: 6px 12px;
+  padding: 7px 14px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -114,10 +115,10 @@ html, body {
   flex-wrap: wrap;
 }
 .tb-action-btn {
-  background: var(--surface2);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  color: var(--text);
+  color: var(--text-dim);
   font-family: 'Ubuntu', sans-serif;
   font-size: 13px;
   font-weight: 500;
@@ -128,7 +129,7 @@ html, body {
   gap: 6px;
   transition: background 0.15s, border-color 0.15s, transform 0.1s;
 }
-.tb-action-btn:hover  { background: var(--surface); border-color: var(--border-lit); }
+.tb-action-btn:hover  { background: var(--accent-dim); border-color: var(--border-lit); color: var(--accent); }
 .tb-action-btn:active { transform: scale(0.97); }
 .tb-action-btn.primary {
   background: var(--accent);
@@ -136,15 +137,14 @@ html, body {
   color: #fff;
   font-weight: 700;
 }
-.tb-action-btn.primary:hover { background: #3a7ee0; border-color: #3a7ee0; }
+.tb-action-btn.primary:hover { background: var(--accent-lit); border-color: var(--accent-lit); color: #fff; }
 .tb-action-btn.active {
   background: var(--accent-dim);
   border-color: var(--accent);
   color: var(--accent);
 }
 .tb-sep {
-  width: 1px;
-  height: 22px;
+  width: 1px; height: 22px;
   background: var(--border);
   margin: 0 4px;
 }
@@ -180,15 +180,14 @@ html, body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 20px;
-  padding: 3px 10px;
+  padding: 3px 12px;
 }
-#conn-dot { font-size: 9px; }
 
 /* ─── CATEGORY TABS ─── */
 #tab-bar {
   background: var(--win-bar1);
   border-bottom: 1px solid var(--border);
-  padding: 0 12px;
+  padding: 0 14px;
   display: flex;
   gap: 2px;
   flex-shrink: 0;
@@ -213,7 +212,7 @@ html, body {
 .tab.active {
   color: var(--accent);
   border-bottom-color: var(--accent);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* ─── MAIN CONTENT ─── */
@@ -240,17 +239,43 @@ html, body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  overflow: hidden;
+  overflow: visible;
   cursor: pointer;
   transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 .idea-card:hover {
   transform: translateY(-2px);
   border-color: var(--border-lit);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 20px rgba(80,60,20,0.12);
 }
+
+/* delete button — appears on hover */
+.card-delete-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--red);
+  border: 2px solid var(--surface);
+  color: #fff;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+  transition: background 0.15s, transform 0.1s;
+  z-index: 10;
+}
+.card-delete-btn:hover { background: #a93226; transform: scale(1.15); }
+.idea-card:hover .card-delete-btn { display: flex; }
 
 .card-header {
   padding: 12px 14px 10px;
@@ -259,11 +284,7 @@ html, body {
   align-items: flex-start;
   gap: 10px;
 }
-.card-cat-icon {
-  font-size: 20px;
-  line-height: 1;
-  margin-top: 1px;
-}
+.card-cat-icon { font-size: 20px; line-height: 1; margin-top: 1px; }
 .card-header-text { flex: 1; min-width: 0; }
 .card-title {
   font-size: 14px;
@@ -275,21 +296,15 @@ html, body {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
-.card-author {
-  font-size: 12px;
-  color: var(--accent);
-  margin-top: 3px;
-  font-weight: 500;
-}
 
 .card-body {
-  padding: 12px 14px;
+  padding: 11px 14px;
   flex: 1;
 }
 .card-text {
   font-size: 13px;
   color: var(--text-dim);
-  line-height: 1.55;
+  line-height: 1.6;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -305,12 +320,12 @@ html, body {
 }
 .card-tag {
   font-size: 11px;
-  font-weight: 500;
-  padding: 2px 8px;
+  font-weight: 600;
+  padding: 2px 9px;
   border-radius: 20px;
-  background: var(--surface2);
+  background: var(--accent-dim);
   border: 1px solid var(--border);
-  color: var(--text-dim);
+  color: var(--accent);
 }
 .card-date {
   font-size: 11px;
@@ -318,11 +333,7 @@ html, body {
   margin-left: auto;
   font-family: 'Ubuntu Mono', monospace;
 }
-.vote-area {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
+.vote-area { display: flex; align-items: center; gap: 5px; }
 .vote-btn {
   background: var(--surface2);
   border: 1px solid var(--border);
@@ -355,8 +366,7 @@ html, body {
 }
 #loading-state .spin {
   font-size: 36px;
-  animation: spin 1.2s linear infinite;
-  display: block;
+  animation: spin 1s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 #empty-state .empty-icon { font-size: 48px; }
@@ -371,64 +381,70 @@ html, body {
   display: flex;
   align-items: center;
   padding: 0 14px;
-  gap: 16px;
+  gap: 0;
   flex-shrink: 0;
 }
 .status-seg {
   font-size: 12px;
   color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  gap: 5px;
+  padding-right: 16px;
 }
-.status-seg + .status-seg { border-left: 1px solid var(--border); padding-left: 16px; }
-#status-clock { margin-left: auto; font-family: 'Ubuntu Mono', monospace; font-size: 12px; color: var(--text-dim); }
+.status-seg + .status-seg {
+  border-left: 1px solid var(--border);
+  padding-left: 16px;
+}
+#status-clock {
+  margin-left: auto;
+  font-family: 'Ubuntu Mono', monospace;
+  font-size: 12px;
+  color: var(--text-dim);
+}
 
-/* ─── MODAL OVERLAY ─── */
-#modal-overlay {
+/* ─── MODALS ─── */
+.modal-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(40,30,10,0.45);
   backdrop-filter: blur(3px);
   z-index: 1000;
   align-items: center;
   justify-content: center;
 }
-#modal-overlay.open { display: flex; }
+.modal-overlay.open { display: flex; }
 
 .dialog-box {
   background: var(--surface);
   border: 1px solid var(--border-lit);
   border-radius: var(--radius-lg);
-  box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+  box-shadow: 0 20px 50px rgba(60,40,10,0.22);
   width: min(500px, 94vw);
   overflow: hidden;
   animation: popIn 0.18s ease;
 }
 @keyframes popIn {
   from { transform: scale(0.93) translateY(10px); opacity: 0; }
-  to   { transform: scale(1) translateY(0);        opacity: 1; }
+  to   { transform: scale(1)    translateY(0);    opacity: 1; }
 }
 .dialog-titlebar {
-  background: linear-gradient(90deg, #0d1117, #1a2035);
-  border-bottom: 1px solid var(--border);
+  background: var(--accent);
   padding: 10px 14px;
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.dialog-titlebar span { font-size: 14px; font-weight: 700; flex: 1; }
+.dialog-titlebar span { font-size: 14px; font-weight: 600; color: #fff; flex: 1; }
 .dialog-close {
-  background: none; border: none; color: var(--text-muted); font-size: 18px;
-  cursor: pointer; line-height: 1; padding: 0 2px;
+  background: none; border: none;
+  color: rgba(255,255,255,0.7);
+  font-size: 20px; cursor: pointer; line-height: 1; padding: 0 2px;
   transition: color 0.1s;
 }
-.dialog-close:hover { color: var(--red); }
+.dialog-close:hover { color: #fff; }
 
 .dialog-content { padding: 20px; }
 .field-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
-.field-row label { font-size: 13px; font-weight: 500; color: var(--text-dim); }
+.field-row label { font-size: 13px; font-weight: 600; color: var(--text-dim); }
 .win-input, .win-textarea, .win-select {
   background: var(--bg);
   border: 1px solid var(--border);
@@ -438,16 +454,15 @@ html, body {
   font-size: 13px;
   color: var(--text);
   width: 100%;
-  transition: border-color 0.15s;
   outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 .win-input:focus, .win-textarea:focus, .win-select:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(79,142,247,0.15);
+  box-shadow: 0 0 0 3px rgba(122,92,40,0.12);
 }
 .win-select { cursor: pointer; }
 .win-textarea { height: 90px; resize: vertical; }
-
 #input-error { color: var(--red); font-size: 12px; display: none; margin-top: -6px; }
 
 .dialog-actions {
@@ -469,7 +484,7 @@ html, body {
   cursor: pointer;
   transition: background 0.15s;
 }
-.btn-primary:hover { background: #3a7ee0; }
+.btn-primary:hover { background: var(--accent-lit); }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
 .btn-secondary {
   background: var(--surface2);
@@ -482,39 +497,50 @@ html, body {
   cursor: pointer;
   transition: background 0.15s;
 }
-.btn-secondary:hover { background: var(--surface); }
-
-/* ─── DETAIL DIALOG ─── */
-#detail-dialog {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(3px);
-  z-index: 1001;
-  align-items: center;
-  justify-content: center;
+.btn-secondary:hover { background: var(--accent-dim); }
+.btn-danger {
+  background: var(--red);
+  border: 1px solid var(--red);
+  border-radius: var(--radius);
+  color: #fff;
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 7px 22px;
+  cursor: pointer;
+  transition: background 0.15s;
 }
-#detail-dialog .dialog-box { width: min(560px, 94vw); }
+.btn-danger:hover { background: #a93226; }
+
+/* Detail */
 #detail-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
-#detail-meta  { font-size: 13px; color: var(--text-muted); margin-bottom: 14px; display: flex; gap: 14px; flex-wrap: wrap; }
+#detail-meta  {
+  font-size: 13px; color: var(--text-muted); margin-bottom: 14px;
+  display: flex; gap: 14px; flex-wrap: wrap;
+}
 #detail-meta span { display: flex; align-items: center; gap: 4px; }
-#detail-body  { font-size: 14px; color: var(--text-dim); line-height: 1.65; margin-bottom: 14px; white-space: pre-wrap; }
-#detail-tags  { display: flex; gap: 8px; flex-wrap: wrap; }
+#detail-body  {
+  font-size: 14px; color: var(--text-dim); line-height: 1.7;
+  margin-bottom: 14px; white-space: pre-wrap;
+}
+#detail-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Confirm delete dialog */
+#confirm-dialog .dialog-box { width: min(360px, 94vw); }
+#confirm-msg { font-size: 14px; color: var(--text-dim); line-height: 1.5; }
 
 /* ─── TOAST ─── */
 #notif {
   position: fixed;
-  bottom: 36px;
+  bottom: 34px;
   right: 16px;
-  background: var(--surface2);
-  border: 1px solid var(--border-lit);
+  background: var(--accent);
   border-radius: var(--radius-lg);
   padding: 10px 18px;
   font-size: 13px;
   font-weight: 500;
-  color: var(--text);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(80,50,10,0.22);
   z-index: 9999;
   display: none;
   animation: toastIn 0.2s ease;
@@ -530,11 +556,11 @@ html, body {
 <!-- TITLEBAR -->
 <div id="titlebar">
   <span class="tb-icon">🎮</span>
-  <span class="tb-title">LoopFire Studio — Game Ideas Board v2.0</span>
+  <span class="tb-title">LoopFire Studio — Game Ideas Board</span>
   <div class="tb-btns">
-    <button class="tb-btn close" title="Schließen">✕</button>
-    <button class="tb-btn min"   title="Minimieren">–</button>
-    <button class="tb-btn max"   title="Maximieren">+</button>
+    <button class="tb-btn close">✕</button>
+    <button class="tb-btn min">–</button>
+    <button class="tb-btn max">+</button>
   </div>
 </div>
 
@@ -549,20 +575,18 @@ html, body {
 
 <!-- TOOLBAR -->
 <div id="toolbar">
-  <button class="tb-action-btn primary" onclick="openNewIdeaDialog()">
-    <span>＋</span> Neue Idee
-  </button>
+  <button class="tb-action-btn primary" onclick="openNewIdeaDialog()">＋ Neue Idee</button>
   <button class="tb-action-btn" onclick="loadIdeas()">↻ Aktualisieren</button>
   <div class="tb-sep"></div>
-  <button class="tb-action-btn" id="sort-date-btn"  onclick="sortBy('date')"  >📅 Neueste</button>
-  <button class="tb-action-btn" id="sort-votes-btn" onclick="sortBy('votes')" >🏆 Beliebteste</button>
+  <button class="tb-action-btn active" id="sort-date-btn"  onclick="sortBy('date')" >📅 Neueste</button>
+  <button class="tb-action-btn"        id="sort-votes-btn" onclick="sortBy('votes')">🏆 Beliebteste</button>
   <div class="tb-sep"></div>
   <div id="search-wrap">
     <span>🔍</span>
     <input id="search-input" type="text" placeholder="Ideen durchsuchen…" oninput="filterIdeas()">
   </div>
   <div id="conn-indicator">
-    <span id="conn-dot">⬤</span>
+    <span id="conn-dot" style="font-size:9px;">⬤</span>
     <span id="conn-text">Verbinde…</span>
   </div>
 </div>
@@ -600,17 +624,13 @@ html, body {
 </div>
 
 <!-- NEW IDEA DIALOG -->
-<div id="modal-overlay" onclick="handleOverlayClick(event)">
+<div id="modal-overlay" class="modal-overlay" onclick="handleOverlayClick(event)">
   <div class="dialog-box" onclick="event.stopPropagation()">
     <div class="dialog-titlebar">
       <span>💡 Neue Idee einreichen</span>
       <button class="dialog-close" onclick="closeDialog()">×</button>
     </div>
     <div class="dialog-content">
-      <div class="field-row">
-        <label for="input-name">👤 Dein Name *</label>
-        <input id="input-name" class="win-input" type="text" placeholder="z.B. Max Mustermann" maxlength="40">
-      </div>
       <div class="field-row">
         <label for="input-title">📌 Titel der Idee *</label>
         <input id="input-title" class="win-input" type="text" placeholder="z.B. Dynamisches Wettersystem" maxlength="60">
@@ -634,14 +654,14 @@ html, body {
     </div>
     <div class="dialog-actions">
       <button class="btn-secondary" onclick="closeDialog()">Abbrechen</button>
-      <button class="btn-primary" id="submit-btn" onclick="submitIdea()">Idee einreichen</button>
+      <button class="btn-primary" id="submit-btn" onclick="submitIdea()">Einreichen</button>
     </div>
   </div>
 </div>
 
 <!-- DETAIL DIALOG -->
-<div id="detail-dialog" onclick="closeDetail()">
-  <div class="dialog-box" onclick="event.stopPropagation()">
+<div id="detail-dialog" class="modal-overlay" onclick="closeDetail()">
+  <div class="dialog-box" onclick="event.stopPropagation()" style="width:min(560px,94vw)">
     <div class="dialog-titlebar">
       <span id="detail-dialog-title">📄 Details</span>
       <button class="dialog-close" onclick="closeDetail()">×</button>
@@ -649,12 +669,30 @@ html, body {
     <div class="dialog-content">
       <div id="detail-title"></div>
       <div id="detail-meta"></div>
-      <hr style="border:none; border-top:1px solid var(--border); margin:0 0 14px;">
+      <hr style="border:none;border-top:1px solid var(--border);margin:0 0 14px">
       <div id="detail-body"></div>
       <div id="detail-tags"></div>
     </div>
     <div class="dialog-actions">
+      <button class="btn-danger" id="detail-delete-btn" onclick="confirmDeleteFromDetail()">🗑 Löschen</button>
       <button class="btn-primary" onclick="closeDetail()">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE DIALOG -->
+<div id="confirm-dialog" class="modal-overlay" onclick="cancelDelete()">
+  <div class="dialog-box" id="confirm-box" onclick="event.stopPropagation()" style="width:min(360px,94vw)">
+    <div class="dialog-titlebar">
+      <span>🗑 Idee löschen</span>
+      <button class="dialog-close" onclick="cancelDelete()">×</button>
+    </div>
+    <div class="dialog-content">
+      <p id="confirm-msg">Möchtest du diese Idee wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.</p>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn-secondary" onclick="cancelDelete()">Abbrechen</button>
+      <button class="btn-danger" onclick="confirmDelete()">Endgültig löschen</button>
     </div>
   </div>
 </div>
@@ -665,7 +703,7 @@ html, body {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
-  getFirestore, collection, addDoc, updateDoc,
+  getFirestore, collection, addDoc, updateDoc, deleteDoc,
   doc, orderBy, query, serverTimestamp, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -682,30 +720,32 @@ const db = getFirestore(app);
 const colRef = collection(db, "Feedback");
 
 let allIdeas = [], currentCategory = "Alle", currentSort = "date", searchQuery = "";
+let pendingDeleteId = null;
+let currentDetailIdea = null;
 
-// Clock
+// ── Clock ──
 function updateClock() {
   const now = new Date();
   document.getElementById('status-clock').textContent =
-    now.toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}) + '  ' +
+    now.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}) + '  ' +
     now.toLocaleDateString('de-DE');
 }
 updateClock(); setInterval(updateClock, 15000);
 
-// Live sync
+// ── Live sync ──
 const q = query(colRef, orderBy("timestamp","desc"));
 onSnapshot(q, snap => {
   allIdeas = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  document.getElementById('conn-dot').style.color  = '#3dd68c';
+  document.getElementById('conn-dot').style.color  = '#3a7d44';
   document.getElementById('conn-text').textContent = 'Live';
   renderIdeas();
-}, err => {
-  document.getElementById('conn-dot').style.color  = '#f75f5f';
+}, () => {
+  document.getElementById('conn-dot').style.color  = '#c0392b';
   document.getElementById('conn-text').textContent = 'Offline';
   showNotif('⚠️ Datenbankverbindung fehlgeschlagen');
 });
 
-// Render
+// ── Render ──
 function renderIdeas() {
   let ideas = [...allIdeas];
   if (currentCategory !== "Alle") ideas = ideas.filter(i => i.category === currentCategory);
@@ -713,13 +753,12 @@ function renderIdeas() {
     const sq = searchQuery.toLowerCase();
     ideas = ideas.filter(i =>
       (i.title||'').toLowerCase().includes(sq) ||
-      (i.idea||'').toLowerCase().includes(sq)  ||
-      (i.author||'').toLowerCase().includes(sq)
+      (i.idea||'').toLowerCase().includes(sq)
     );
   }
   if (currentSort === 'votes') ideas.sort((a,b) => (b.votes||0)-(a.votes||0));
 
-  const grid = document.getElementById('ideas-grid');
+  const grid    = document.getElementById('ideas-grid');
   const loading = document.getElementById('loading-state');
   const empty   = document.getElementById('empty-state');
   loading.style.display = 'none';
@@ -733,37 +772,36 @@ function renderIdeas() {
     grid.innerHTML = '';
     ideas.forEach(i => grid.appendChild(makeCard(i)));
   }
-  const total = allIdeas.length;
   document.getElementById('status-count').textContent = `${ideas.length} Idee${ideas.length!==1?'n':''}`;
-  document.getElementById('status-left').textContent  = `${total} gesamt · Live-Sync aktiv`;
+  document.getElementById('status-left').textContent  = `${allIdeas.length} gesamt · Live-Sync aktiv`;
 }
 
-const catIcons = { Gameplay:'⚔️', Story:'📖', Design:'🎨', Sound:'🎵', Level:'🗺️', Sonstiges:'💡' };
-const catColors = { Gameplay:'#f7c94f', Story:'#7c5cfc', Design:'#f75f5f', Sound:'#3dd68c', Level:'#4f8ef7', Sonstiges:'#8b92b0' };
+const catIcons  = { Gameplay:'⚔️', Story:'📖', Design:'🎨', Sound:'🎵', Level:'🗺️', Sonstiges:'💡' };
+const catColors = { Gameplay:'#c8860a', Story:'#7a5c28', Design:'#c0392b', Sound:'#3a7d44', Level:'#2e6da4', Sonstiges:'#6b5d50' };
 
 function makeCard(idea) {
-  const card = document.createElement('div');
+  const card  = document.createElement('div');
   card.className = 'idea-card';
-  const icon  = catIcons[idea.category] || '💡';
-  const color = catColors[idea.category] || '#8b92b0';
+  const icon  = catIcons[idea.category]  || '💡';
+  const color = catColors[idea.category] || '#6b5d50';
   const date  = idea.timestamp?.toDate
     ? idea.timestamp.toDate().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'})
     : '—';
   const votes = idea.votes || 0;
 
   card.innerHTML = `
+    <button class="card-delete-btn" title="Idee löschen" onclick="event.stopPropagation(); askDelete('${idea.id}', ${JSON.stringify(esc(idea.title||'?')).replace(/"/g,"'")})">✕</button>
     <div class="card-header">
       <div class="card-cat-icon">${icon}</div>
       <div class="card-header-text">
         <div class="card-title">${esc(idea.title||'Unbekannt')}</div>
-        <div class="card-author">${esc(idea.author||'Anonym')}</div>
       </div>
     </div>
     <div class="card-body">
-      <div class="card-text">${esc(trunc(idea.idea||'',120))}</div>
+      <div class="card-text">${esc(trunc(idea.idea||'',130))}</div>
     </div>
     <div class="card-footer">
-      <span class="card-tag" style="border-color:${color}40; color:${color};">${esc(idea.category||'Sonstiges')}</span>
+      <span class="card-tag" style="border-color:${color}55;color:${color};">${esc(idea.category||'Sonstiges')}</span>
       <div class="vote-area">
         <button class="vote-btn" onclick="event.stopPropagation(); vote('${idea.id}',${votes})">👍</button>
         <span class="vote-count">${votes}</span>
@@ -777,86 +815,116 @@ function makeCard(idea) {
 function trunc(s,n){ return s.length>n ? s.slice(0,n)+'…' : s; }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-// Vote
+// ── Vote ──
 window.vote = async (id, cur) => {
   try { await updateDoc(doc(db,"Feedback",id),{votes:cur+1}); showNotif('👍 Vote gezählt!'); }
   catch { showNotif('⚠️ Vote fehlgeschlagen'); }
 };
 
-// Submit
+// ── Delete flow ──
+window.askDelete = (id, titleRaw) => {
+  pendingDeleteId = id;
+  document.getElementById('confirm-msg').textContent =
+    `Möchtest du die Idee "${titleRaw}" wirklich löschen? Das kann nicht rückgängig gemacht werden.`;
+  document.getElementById('confirm-dialog').classList.add('open');
+};
+window.cancelDelete = () => {
+  pendingDeleteId = null;
+  document.getElementById('confirm-dialog').classList.remove('open');
+};
+window.confirmDelete = async () => {
+  if (!pendingDeleteId) return;
+  const id = pendingDeleteId;
+  pendingDeleteId = null;
+  document.getElementById('confirm-dialog').classList.remove('open');
+  // also close detail if open for this idea
+  if (currentDetailIdea?.id === id) closeDetail();
+  try {
+    await deleteDoc(doc(db,"Feedback",id));
+    showNotif('🗑 Idee gelöscht.');
+  } catch(e) { showNotif('⚠️ Löschen fehlgeschlagen: ' + e.message); }
+};
+window.confirmDeleteFromDetail = () => {
+  if (!currentDetailIdea) return;
+  closeDetail();
+  window.askDelete(currentDetailIdea.id, currentDetailIdea.title||'?');
+};
+
+// ── Submit ──
 window.submitIdea = async () => {
-  const name  = document.getElementById('input-name').value.trim();
   const title = document.getElementById('input-title').value.trim();
   const idea  = document.getElementById('input-idea').value.trim();
   const cat   = document.getElementById('input-category').value;
   const errEl = document.getElementById('input-error');
-  if (!name||!title||!idea) { errEl.textContent='⚠️ Bitte alle Pflichtfelder ausfüllen!'; errEl.style.display='block'; return; }
+  if (!title||!idea) { errEl.textContent='⚠️ Bitte alle Pflichtfelder ausfüllen!'; errEl.style.display='block'; return; }
   errEl.style.display='none';
   const btn = document.getElementById('submit-btn');
-  btn.textContent = '⏳ Senden…'; btn.disabled = true;
+  btn.textContent='⏳ Senden…'; btn.disabled=true;
   try {
-    await addDoc(colRef,{author:name,title,idea,category:cat,votes:0,timestamp:serverTimestamp()});
+    await addDoc(colRef,{title,idea,category:cat,votes:0,timestamp:serverTimestamp()});
     closeDialog(); showNotif('✅ Idee erfolgreich eingereicht!');
   } catch(e) { errEl.textContent='⚠️ Fehler: '+e.message; errEl.style.display='block'; }
-  finally { btn.textContent='Idee einreichen'; btn.disabled=false; }
+  finally { btn.textContent='Einreichen'; btn.disabled=false; }
 };
 
-// Detail
+// ── Detail ──
 window.showDetail = idea => {
-  const date = idea.timestamp?.toDate ? idea.timestamp.toDate().toLocaleString('de-DE') : '—';
-  const color = catColors[idea.category]||'#8b92b0';
-  document.getElementById('detail-dialog-title').textContent = idea.title;
-  document.getElementById('detail-title').textContent = idea.title;
-  document.getElementById('detail-meta').innerHTML = `
-    <span>👤 ${esc(idea.author||'Anonym')}</span>
-    <span>📅 ${date}</span>
-    <span>👍 ${idea.votes||0} Votes</span>`;
-  document.getElementById('detail-body').textContent = idea.idea;
+  currentDetailIdea = idea;
+  const date  = idea.timestamp?.toDate ? idea.timestamp.toDate().toLocaleString('de-DE') : '—';
+  const color = catColors[idea.category]||'#6b5d50';
+  document.getElementById('detail-dialog-title').textContent = idea.title||'Detail';
+  document.getElementById('detail-title').textContent = idea.title||'';
+  document.getElementById('detail-meta').innerHTML =
+    `<span>📅 ${date}</span><span>👍 ${idea.votes||0} Votes</span>`;
+  document.getElementById('detail-body').textContent = idea.idea||'';
   document.getElementById('detail-tags').innerHTML =
-    `<span class="card-tag" style="border-color:${color}40;color:${color};">${esc(idea.category||'Sonstiges')}</span>`;
-  document.getElementById('detail-dialog').style.display = 'flex';
+    `<span class="card-tag" style="border-color:${color}55;color:${color};">${esc(idea.category||'Sonstiges')}</span>`;
+  document.getElementById('detail-dialog').classList.add('open');
 };
-window.closeDetail = () => { document.getElementById('detail-dialog').style.display='none'; };
+window.closeDetail = () => {
+  currentDetailIdea = null;
+  document.getElementById('detail-dialog').classList.remove('open');
+};
 
-// Dialog
+// ── New idea dialog ──
 window.openNewIdeaDialog = () => {
-  ['input-name','input-title','input-idea'].forEach(id => document.getElementById(id).value='');
+  ['input-title','input-idea'].forEach(id => document.getElementById(id).value='');
   document.getElementById('input-error').style.display='none';
   document.getElementById('modal-overlay').classList.add('open');
-  setTimeout(()=>document.getElementById('input-name').focus(),80);
+  setTimeout(()=>document.getElementById('input-title').focus(),80);
 };
 window.closeDialog = () => document.getElementById('modal-overlay').classList.remove('open');
 window.handleOverlayClick = e => { if(e.target===document.getElementById('modal-overlay')) closeDialog(); };
 
-// Filters
+// ── Filters ──
 window.loadIdeas = () => showNotif('🔄 Synchronisiere…');
 window.sortBy = type => {
   currentSort = type;
   document.getElementById('sort-votes-btn').classList.toggle('active', type==='votes');
-  document.getElementById('sort-date-btn').classList.toggle('active', type==='date');
+  document.getElementById('sort-date-btn').classList.toggle('active',  type==='date');
   renderIdeas();
 };
 window.setCategory = cat => {
   currentCategory = cat;
-  document.querySelectorAll('.tab').forEach(t => {
-    t.classList.toggle('active',
-      cat==='Alle' ? t.textContent.trim()==='Alle' : t.textContent.includes(cat));
-  });
+  document.querySelectorAll('.tab').forEach(t =>
+    t.classList.toggle('active', cat==='Alle' ? t.textContent.trim()==='Alle' : t.textContent.includes(cat))
+  );
   renderIdeas();
 };
 window.filterIdeas = () => { searchQuery=document.getElementById('search-input').value.trim(); renderIdeas(); };
 
-// Toast
+// ── Toast ──
 function showNotif(msg) {
   const el = document.getElementById('notif');
   el.textContent=msg; el.style.display='block';
   clearTimeout(el._t); el._t=setTimeout(()=>el.style.display='none',2800);
 }
 
-// Keyboard
+// ── Keyboard ──
 document.addEventListener('keydown', e => {
-  if (e.key==='Escape') { closeDialog(); closeDetail(); }
-  if (e.key==='Enter' && e.ctrlKey && document.getElementById('modal-overlay').classList.contains('open')) window.submitIdea();
+  if (e.key==='Escape') { closeDialog(); closeDetail(); cancelDelete(); }
+  if (e.key==='Enter' && e.ctrlKey && document.getElementById('modal-overlay').classList.contains('open'))
+    window.submitIdea();
 });
 </script>
 </body>
