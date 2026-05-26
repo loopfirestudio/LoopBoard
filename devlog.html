@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LoopFire Studio — DevLog & Downloads</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #f2ead8;
+  --surface:    #faf4e6;
+  --surface2:   #ede4cc;
+  --border:     #cfc4a0;
+  --border-lit: #b0a070;
+  --accent:     #7a5c28;
+  --accent-lit: #9b7535;
+  --accent-dim: #e8dbbf;
+  --green:      #3a7d44;
+  --red:        #c0392b;
+  --red-dim:    #fde8e6;
+  --text:       #2b2520;
+  --text-dim:   #4a4035;
+  --text-muted: #8a7d65;
+  --win-bar1:   #e8dfc8;
+  --win-bar2:   #ede5cf;
+  --radius:     6px;
+  --radius-lg:  10px;
+  --dl-accent:  #2e6da4;
+  --dl-dim:     #ddeaf7;
+}
+
+html, body {
+  height: 100%; overflow: hidden;
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 14px;
+  background: var(--bg);
+  color: var(--text);
+  display: flex; flex-direction: column;
+}
+
+/* ─── TITLEBAR ─── */
+#titlebar {
+  background: var(--accent);
+  border-bottom: 1px solid var(--border-lit);
+  height: 34px;
+  display: flex; align-items: center;
+  padding: 0 14px; gap: 10px;
+  flex-shrink: 0; user-select: none;
+}
+.tb-title { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.88); flex: 1; letter-spacing: .3px; }
+.tb-btns  { display: flex; gap: 7px; }
+.tb-btn   { width:13px; height:13px; border-radius:50%; border:none; cursor:pointer; font-size:8px; font-weight:bold; color:transparent; transition: color .15s; }
+.tb-btn:hover { color: rgba(0,0,0,.55); }
+.tb-btn.close { background:#ff5f57; }
+.tb-btn.min   { background:#febc2e; }
+.tb-btn.max   { background:#28c840; }
+
+/* ─── MENUBAR ─── */
+#menubar {
+  background: var(--win-bar1);
+  border-bottom: 1px solid var(--border);
+  height: 30px; display: flex; align-items: stretch;
+  padding: 0 8px; flex-shrink: 0;
+}
+.menu-item {
+  padding: 0 14px; display: flex; align-items: center;
+  font-size: 13px; color: var(--text-dim); cursor: pointer;
+  border-radius: 4px; margin: 3px 2px;
+  transition: background .1s, color .1s;
+}
+.menu-item:hover { background: var(--accent-dim); color: var(--accent); }
+
+/* ─── TOOLBAR ─── */
+#toolbar {
+  background: var(--win-bar2);
+  border-bottom: 1px solid var(--border);
+  padding: 7px 14px; display: flex; align-items: center;
+  gap: 6px; flex-shrink: 0; flex-wrap: wrap;
+}
+.tb-action-btn {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); color: var(--text-dim);
+  font-family: 'Ubuntu', sans-serif; font-size: 13px; font-weight: 500;
+  padding: 5px 14px; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  transition: background .15s, border-color .15s, transform .1s;
+}
+.tb-action-btn:hover  { background: var(--accent-dim); border-color: var(--border-lit); color: var(--accent); }
+.tb-action-btn:active { transform: scale(.97); }
+.tb-action-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+.tb-action-btn.primary:hover { background: var(--accent-lit); border-color: var(--accent-lit); color: #fff; }
+.tb-action-btn.dl-primary { background: var(--dl-accent); border-color: var(--dl-accent); color: #fff; font-weight: 700; }
+.tb-action-btn.dl-primary:hover { background: #255a8a; border-color: #255a8a; color: #fff; }
+.tb-sep { width:1px; height:22px; background: var(--border); margin: 0 4px; }
+#conn-indicator {
+  margin-left: auto; font-size: 12px; color: var(--text-muted);
+  display: flex; align-items: center; gap: 5px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 3px 12px;
+}
+
+/* ─── MAIN SPLIT LAYOUT ─── */
+#workspace {
+  flex: 1; display: flex; overflow: hidden;
+}
+
+/* ─── LEFT: CHANGELOG 75% ─── */
+#changelog-pane {
+  flex: 0 0 75%; width: 75%;
+  border-right: 2px solid var(--border);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.pane-header {
+  background: var(--win-bar1);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 16px;
+  display: flex; align-items: center; gap: 10px;
+  flex-shrink: 0;
+}
+.pane-title { font-size: 13px; font-weight: 700; color: var(--text-dim); flex: 1; }
+.pane-badge {
+  font-size: 11px; font-weight: 600; padding: 2px 8px;
+  border-radius: 20px; background: var(--accent-dim);
+  border: 1px solid var(--border); color: var(--accent);
+  font-family: 'Ubuntu Mono', monospace;
+}
+.pane-badge.dl { background: var(--dl-dim); border-color: #a0c0e0; color: var(--dl-accent); }
+
+#changelog-scroll {
+  flex: 1; overflow-y: auto; padding: 20px;
+  background: var(--bg);
+}
+#changelog-scroll::-webkit-scrollbar { width: 8px; }
+#changelog-scroll::-webkit-scrollbar-track { background: transparent; }
+#changelog-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+#changelog-scroll::-webkit-scrollbar-thumb:hover { background: var(--border-lit); }
+
+/* ─── CHANGELOG ENTRY ─── */
+.cl-entry {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
+  overflow: hidden;
+  transition: box-shadow .15s, border-color .15s;
+  position: relative;
+}
+.cl-entry:hover { border-color: var(--border-lit); box-shadow: 0 4px 14px rgba(80,60,20,.1); }
+
+.cl-entry-header {
+  padding: 12px 16px;
+  background: var(--win-bar1);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.cl-version {
+  font-family: 'Ubuntu Mono', monospace;
+  font-size: 13px; font-weight: 700;
+  background: var(--accent); color: #fff;
+  padding: 2px 9px; border-radius: 4px;
+  flex-shrink: 0;
+}
+.cl-title-text { font-size: 15px; font-weight: 700; color: var(--text); flex: 1; }
+.cl-date { font-size: 12px; color: var(--text-muted); font-family: 'Ubuntu Mono', monospace; }
+.cl-delete-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--text-muted); font-size: 15px; padding: 2px 6px;
+  border-radius: var(--radius); transition: background .1s, color .1s;
+  opacity: 0;
+}
+.cl-entry:hover .cl-delete-btn { opacity: 1; }
+.cl-delete-btn:hover { background: var(--red-dim); color: var(--red); }
+
+.cl-body { padding: 14px 16px 16px; }
+.cl-description {
+  font-size: 13.5px; color: var(--text-dim);
+  line-height: 1.7; white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* change list inside body */
+.cl-changes { margin-top: 12px; display: flex; flex-direction: column; gap: 5px; }
+.cl-change-item {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: 13px; color: var(--text-dim); line-height: 1.5;
+}
+.cl-change-bullet {
+  flex-shrink: 0; width: 20px; height: 20px;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; margin-top: 1px;
+}
+.cl-change-bullet.add  { background: #d4edda; color: var(--green); }
+.cl-change-bullet.fix  { background: #fde8e6; color: var(--red);   }
+.cl-change-bullet.chg  { background: var(--accent-dim); color: var(--accent); }
+
+/* ─── RIGHT: DOWNLOADS 25% ─── */
+#downloads-pane {
+  flex: 0 0 25%; width: 25%;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+
+#downloads-scroll {
+  flex: 1; overflow-y: auto; padding: 14px 12px;
+  background: var(--bg);
+}
+#downloads-scroll::-webkit-scrollbar { width: 6px; }
+#downloads-scroll::-webkit-scrollbar-track { background: transparent; }
+#downloads-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* ─── DOWNLOAD CARD ─── */
+.dl-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 10px;
+  overflow: hidden;
+  position: relative;
+  transition: box-shadow .15s, border-color .15s;
+}
+.dl-card:hover { border-color: #a0c0e0; box-shadow: 0 4px 12px rgba(46,109,164,.1); }
+
+.dl-card-header {
+  padding: 9px 12px 8px;
+  background: #ddeaf7;
+  border-bottom: 1px solid #c0d8ee;
+  display: flex; align-items: center; gap: 8px;
+}
+.dl-platform-icon { font-size: 18px; }
+.dl-platform-name { font-size: 13px; font-weight: 700; color: var(--dl-accent); flex: 1; }
+.dl-version-badge {
+  font-size: 10px; font-weight: 700;
+  font-family: 'Ubuntu Mono', monospace;
+  background: var(--dl-accent); color: #fff;
+  padding: 1px 6px; border-radius: 3px;
+}
+.dl-delete-btn {
+  background: none; border: none; cursor: pointer;
+  color: #90b0cc; font-size: 14px; padding: 1px 5px;
+  border-radius: var(--radius); transition: background .1s, color .1s;
+  opacity: 0;
+}
+.dl-card:hover .dl-delete-btn { opacity: 1; }
+.dl-delete-btn:hover { background: var(--red-dim); color: var(--red); }
+
+.dl-card-body { padding: 10px 12px 12px; }
+.dl-label { font-size: 12px; font-weight: 600; color: var(--text-dim); margin-bottom: 4px; }
+.dl-link-row {
+  display: flex; align-items: center; gap: 6px;
+}
+.dl-link {
+  font-size: 11px; color: var(--dl-accent);
+  font-family: 'Ubuntu Mono', monospace;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  flex: 1;
+  text-decoration: none;
+}
+.dl-link:hover { text-decoration: underline; }
+.dl-copy-btn {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 4px; color: var(--text-muted); font-size: 11px;
+  padding: 2px 7px; cursor: pointer; flex-shrink: 0;
+  font-family: 'Ubuntu', sans-serif;
+  transition: background .1s, color .1s;
+}
+.dl-copy-btn:hover { background: var(--dl-dim); color: var(--dl-accent); border-color: #a0c0e0; }
+.dl-open-btn {
+  display: block; width: 100%; margin-top: 8px;
+  background: var(--dl-accent); border: none;
+  border-radius: var(--radius); color: #fff;
+  font-family: 'Ubuntu', sans-serif; font-size: 12px; font-weight: 700;
+  padding: 6px 10px; cursor: pointer; text-align: center;
+  text-decoration: none;
+  transition: background .15s;
+}
+.dl-open-btn:hover { background: #255a8a; }
+.dl-note { font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.4; }
+.dl-date { font-size: 10px; color: var(--text-muted); margin-top: 6px; font-family: 'Ubuntu Mono', monospace; }
+
+/* ─── EMPTY / LOADING ─── */
+.pane-empty {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 50px 20px; gap: 12px;
+  color: var(--text-muted); text-align: center;
+}
+.pane-empty .ei { font-size: 36px; }
+.pane-empty p { font-size: 13px; color: var(--text-dim); }
+.spin { display: inline-block; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── STATUSBAR ─── */
+#statusbar {
+  background: var(--win-bar1); border-top: 1px solid var(--border);
+  height: 26px; display: flex; align-items: center;
+  padding: 0 14px; gap: 0; flex-shrink: 0;
+}
+.status-seg { font-size: 12px; color: var(--text-muted); padding-right: 14px; }
+.status-seg + .status-seg { border-left: 1px solid var(--border); padding-left: 14px; }
+#status-clock { margin-left: auto; font-family: 'Ubuntu Mono', monospace; font-size: 12px; color: var(--text-dim); }
+
+/* ─── MODALS ─── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(40,30,10,.45);
+  backdrop-filter: blur(3px);
+  z-index: 1000; align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+
+.dialog-box {
+  background: var(--surface); border: 1px solid var(--border-lit);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 50px rgba(60,40,10,.22);
+  width: min(560px, 95vw); overflow: hidden;
+  animation: popIn .18s ease;
+}
+@keyframes popIn {
+  from { transform: scale(.93) translateY(10px); opacity: 0; }
+  to   { transform: scale(1)   translateY(0);    opacity: 1; }
+}
+.dialog-titlebar {
+  background: var(--accent); padding: 10px 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.dialog-titlebar.dl-bar { background: var(--dl-accent); }
+.dialog-titlebar span { font-size: 14px; font-weight: 600; color: #fff; flex: 1; }
+.dialog-close {
+  background: none; border: none; color: rgba(255,255,255,.7);
+  font-size: 20px; cursor: pointer; line-height: 1; padding: 0 2px;
+  transition: color .1s;
+}
+.dialog-close:hover { color: #fff; }
+
+.dialog-content { padding: 18px 20px 4px; max-height: 60vh; overflow-y: auto; }
+.dialog-content::-webkit-scrollbar { width: 6px; }
+.dialog-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.field-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 13px; }
+.field-row label { font-size: 13px; font-weight: 600; color: var(--text-dim); }
+.field-hint { font-size: 11px; color: var(--text-muted); margin-top: -2px; }
+.win-input, .win-textarea, .win-select {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 8px 10px;
+  font-family: 'Ubuntu', sans-serif; font-size: 13px;
+  color: var(--text); width: 100%; outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.win-input:focus, .win-textarea:focus, .win-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(122,92,40,.12);
+}
+.win-input.dl-focus:focus { border-color: var(--dl-accent); box-shadow: 0 0 0 3px rgba(46,109,164,.12); }
+.win-textarea { resize: vertical; }
+.win-textarea.mono { font-family: 'Ubuntu Mono', monospace; font-size: 12px; }
+
+/* change-list builder */
+#change-list { margin-top: 2px; }
+.change-row {
+  display: flex; gap: 6px; margin-bottom: 6px; align-items: center;
+}
+.change-row select { width: 90px; flex-shrink: 0; }
+.change-row input  { flex: 1; }
+.change-row .rm-btn {
+  background: none; border: 1px solid var(--border); border-radius: 4px;
+  color: var(--text-muted); cursor: pointer; padding: 4px 8px; font-size: 12px;
+  flex-shrink: 0; transition: background .1s, color .1s;
+}
+.change-row .rm-btn:hover { background: var(--red-dim); color: var(--red); border-color: #e0a0a0; }
+#add-change-btn {
+  background: var(--accent-dim); border: 1px dashed var(--border-lit);
+  border-radius: var(--radius); color: var(--accent);
+  font-family: 'Ubuntu', sans-serif; font-size: 12px;
+  padding: 5px 12px; cursor: pointer; width: 100%;
+  margin-top: 2px; transition: background .1s;
+}
+#add-change-btn:hover { background: #ddd0a8; }
+
+.form-error { color: var(--red); font-size: 12px; display: none; margin-bottom: 8px; }
+
+.dialog-actions {
+  padding: 12px 20px 16px; display: flex; justify-content: flex-end; gap: 8px;
+  border-top: 1px solid var(--border);
+}
+.btn-primary {
+  background: var(--accent); border: 1px solid var(--accent);
+  border-radius: var(--radius); color: #fff;
+  font-family: 'Ubuntu', sans-serif; font-size: 13px; font-weight: 700;
+  padding: 7px 22px; cursor: pointer; transition: background .15s;
+}
+.btn-primary:hover { background: var(--accent-lit); }
+.btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+.btn-dl {
+  background: var(--dl-accent); border: 1px solid var(--dl-accent);
+  border-radius: var(--radius); color: #fff;
+  font-family: 'Ubuntu', sans-serif; font-size: 13px; font-weight: 700;
+  padding: 7px 22px; cursor: pointer; transition: background .15s;
+}
+.btn-dl:hover { background: #255a8a; }
+.btn-dl:disabled { opacity: .6; cursor: not-allowed; }
+.btn-secondary {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius); color: var(--text-dim);
+  font-family: 'Ubuntu', sans-serif; font-size: 13px;
+  padding: 7px 22px; cursor: pointer; transition: background .15s;
+}
+.btn-secondary:hover { background: var(--accent-dim); }
+.btn-danger {
+  background: var(--red); border: 1px solid var(--red);
+  border-radius: var(--radius); color: #fff;
+  font-family: 'Ubuntu', sans-serif; font-size: 13px; font-weight: 700;
+  padding: 7px 22px; cursor: pointer; transition: background .15s;
+}
+.btn-danger:hover { background: #a93226; }
+
+/* ─── TOAST ─── */
+#notif {
+  position: fixed; bottom: 34px; right: 16px;
+  background: var(--accent); border-radius: var(--radius-lg);
+  padding: 10px 18px; font-size: 13px; font-weight: 500; color: #fff;
+  box-shadow: 0 6px 20px rgba(80,50,10,.22);
+  z-index: 9999; display: none;
+  animation: toastIn .2s ease;
+}
+@keyframes toastIn {
+  from { transform: translateY(12px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+</style>
+</head>
+<body>
+
+<!-- TITLEBAR -->
+<div id="titlebar">
+  <span style="font-size:16px">🎮</span>
+  <span class="tb-title">LoopFire Studio — DevLog &amp; Downloads</span>
+  <div class="tb-btns">
+    <button class="tb-btn close">✕</button>
+    <button class="tb-btn min">–</button>
+    <button class="tb-btn max">+</button>
+  </div>
+</div>
+
+<!-- MENUBAR -->
+<div id="menubar">
+  <div class="menu-item">Datei</div>
+  <div class="menu-item">Bearbeiten</div>
+  <div class="menu-item">Ansicht</div>
+  <div class="menu-item">Extras</div>
+  <div class="menu-item">?</div>
+</div>
+
+<!-- TOOLBAR -->
+<div id="toolbar">
+  <button class="tb-action-btn primary" onclick="openChangelogDialog()">📝 Changelog veröffentlichen</button>
+  <div class="tb-sep"></div>
+  <button class="tb-action-btn dl-primary" onclick="openDownloadDialog()">⬇️ Download hinzufügen</button>
+  <div id="conn-indicator">
+    <span id="conn-dot" style="font-size:9px;">⬤</span>
+    <span id="conn-text">Verbinde…</span>
+  </div>
+</div>
+
+<!-- SPLIT WORKSPACE -->
+<div id="workspace">
+
+  <!-- LEFT: CHANGELOG -->
+  <div id="changelog-pane">
+    <div class="pane-header">
+      <span style="font-size:16px">📋</span>
+      <span class="pane-title">Changelog</span>
+      <span class="pane-badge" id="cl-count">0 Einträge</span>
+    </div>
+    <div id="changelog-scroll">
+      <div id="cl-loading" class="pane-empty">
+        <span class="ei spin">⟳</span>
+        <p>Lade Changelogs…</p>
+      </div>
+      <div id="cl-empty" class="pane-empty" style="display:none">
+        <span class="ei">📭</span>
+        <p>Noch keine Changelogs veröffentlicht.</p>
+      </div>
+      <div id="cl-list"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: DOWNLOADS -->
+  <div id="downloads-pane">
+    <div class="pane-header">
+      <span style="font-size:16px">⬇️</span>
+      <span class="pane-title">Downloads</span>
+      <span class="pane-badge dl" id="dl-count">0</span>
+    </div>
+    <div id="downloads-scroll">
+      <div id="dl-loading" class="pane-empty">
+        <span class="ei spin">⟳</span>
+        <p>Lade Downloads…</p>
+      </div>
+      <div id="dl-empty" class="pane-empty" style="display:none">
+        <span class="ei">📦</span>
+        <p>Keine Download-Links vorhanden.</p>
+      </div>
+      <div id="dl-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- STATUSBAR -->
+<div id="statusbar">
+  <div class="status-seg" id="st-cl">0 Changelogs</div>
+  <div class="status-seg" id="st-dl">0 Downloads</div>
+  <div class="status-seg" id="st-sync">Live-Sync aktiv</div>
+  <div id="status-clock"></div>
+</div>
+
+<!-- CHANGELOG DIALOG -->
+<div id="cl-dialog" class="modal-overlay" onclick="handleOverlay(event,'cl-dialog')">
+  <div class="dialog-box" onclick="event.stopPropagation()" style="width:min(620px,95vw)">
+    <div class="dialog-titlebar">
+      <span>📝 Changelog veröffentlichen</span>
+      <button class="dialog-close" onclick="closeDialog('cl-dialog')">×</button>
+    </div>
+    <div class="dialog-content">
+      <div style="display:flex;gap:12px;">
+        <div class="field-row" style="flex:1">
+          <label>📌 Titel *</label>
+          <input id="cl-title" class="win-input" placeholder="z.B. Großes Update – Neue Welt" maxlength="80">
+        </div>
+        <div class="field-row" style="flex:0 0 120px">
+          <label>🏷 Version *</label>
+          <input id="cl-version" class="win-input" placeholder="v1.2.0" maxlength="20">
+        </div>
+      </div>
+      <div class="field-row">
+        <label>📝 Beschreibung</label>
+        <textarea id="cl-desc" class="win-textarea" style="height:70px" placeholder="Kurze Zusammenfassung des Updates…"></textarea>
+      </div>
+      <div class="field-row">
+        <label>📋 Änderungen</label>
+        <div class="field-hint">Typ wählen und Änderung eingeben (+ Neu, 🔧 Fix, ✏️ Änderung)</div>
+        <div id="change-list"></div>
+        <button id="add-change-btn" onclick="addChangeRow()">＋ Änderung hinzufügen</button>
+      </div>
+      <div class="form-error" id="cl-error"></div>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn-secondary" onclick="closeDialog('cl-dialog')">Abbrechen</button>
+      <button class="btn-primary" id="cl-submit-btn" onclick="submitChangelog()">📤 Veröffentlichen</button>
+    </div>
+  </div>
+</div>
+
+<!-- DOWNLOAD DIALOG -->
+<div id="dl-dialog" class="modal-overlay" onclick="handleOverlay(event,'dl-dialog')">
+  <div class="dialog-box" onclick="event.stopPropagation()">
+    <div class="dialog-titlebar dl-bar">
+      <span>⬇️ Download-Link hinzufügen</span>
+      <button class="dialog-close" onclick="closeDialog('dl-dialog')">×</button>
+    </div>
+    <div class="dialog-content">
+      <div style="display:flex;gap:12px;">
+        <div class="field-row" style="flex:1">
+          <label>💻 Plattform *</label>
+          <select id="dl-platform" class="win-select">
+            <option value="Windows">🪟 Windows</option>
+            <option value="macOS">🍎 macOS</option>
+            <option value="Linux">🐧 Linux</option>
+            <option value="Android">🤖 Android</option>
+            <option value="iOS">📱 iOS</option>
+            <option value="Web">🌐 Web / Browser</option>
+            <option value="itch.io">🎮 itch.io</option>
+            <option value="Steam">♨️ Steam</option>
+            <option value="Sonstiges">📦 Sonstiges</option>
+          </select>
+        </div>
+        <div class="field-row" style="flex:0 0 120px">
+          <label>🏷 Version *</label>
+          <input id="dl-version" class="win-input dl-focus" placeholder="v1.2.0" maxlength="20">
+        </div>
+      </div>
+      <div class="field-row">
+        <label>🔗 Download-URL *</label>
+        <input id="dl-url" class="win-input dl-focus" type="url" placeholder="https://example.com/game-v1.0.zip">
+      </div>
+      <div class="field-row">
+        <label>🏷 Bezeichnung</label>
+        <input id="dl-label" class="win-input dl-focus" placeholder="z.B. Installer (64-bit)" maxlength="60">
+      </div>
+      <div class="field-row">
+        <label>📝 Hinweis</label>
+        <textarea id="dl-note" class="win-textarea" style="height:55px" placeholder="z.B. Benötigt DirectX 12, min. 8 GB RAM…"></textarea>
+      </div>
+      <div class="form-error" id="dl-error"></div>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn-secondary" onclick="closeDialog('dl-dialog')">Abbrechen</button>
+      <button class="btn-dl" id="dl-submit-btn" onclick="submitDownload()">⬇️ Hinzufügen</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE -->
+<div id="confirm-dialog" class="modal-overlay" onclick="cancelDelete()">
+  <div class="dialog-box" onclick="event.stopPropagation()" style="width:min(360px,94vw)">
+    <div class="dialog-titlebar" style="background:var(--red)">
+      <span>🗑 Eintrag löschen</span>
+      <button class="dialog-close" onclick="cancelDelete()">×</button>
+    </div>
+    <div class="dialog-content">
+      <p id="confirm-msg" style="font-size:14px;color:var(--text-dim);line-height:1.5;padding-bottom:6px"></p>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn-secondary" onclick="cancelDelete()">Abbrechen</button>
+      <button class="btn-danger"    onclick="confirmDelete()">Endgültig löschen</button>
+    </div>
+  </div>
+</div>
+
+<div id="notif"></div>
+
+<script type="module">
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, deleteDoc,
+  doc, orderBy, query, serverTimestamp, onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const app = initializeApp({
+  apiKey:            "AIzaSyAy16r_mgPt39-O5ol2CWShH-Zl_v13OoU",
+  authDomain:        "loopfire-studio.firebaseapp.com",
+  databaseURL:       "https://loopfire-studio-default-rtdb.firebaseio.com",
+  projectId:         "loopfire-studio",
+  storageBucket:     "loopfire-studio.firebasestorage.app",
+  messagingSenderId: "671968406115",
+  appId:             "1:671968406115:web:d5250c8fb2d43034b26656"
+});
+const db     = getFirestore(app);
+const colRef = collection(db, "Blogposts");
+
+let pendingDeleteId = null;
+
+// ── Clock ──
+function tick() {
+  const n = new Date();
+  document.getElementById('status-clock').textContent =
+    n.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}) + '  ' +
+    n.toLocaleDateString('de-DE');
+}
+tick(); setInterval(tick, 15000);
+
+// ── Live Sync ──
+const q = query(colRef, orderBy("timestamp","desc"));
+onSnapshot(q, snap => {
+  const all = snap.docs.map(d => ({id:d.id, ...d.data()}));
+  document.getElementById('conn-dot').style.color  = '#3a7d44';
+  document.getElementById('conn-text').textContent = 'Live';
+
+  const changelogs = all.filter(d => d.type === 'changelog');
+  const downloads  = all.filter(d => d.type === 'download');
+  renderChangelogs(changelogs);
+  renderDownloads(downloads);
+
+  document.getElementById('cl-count').textContent = `${changelogs.length} Eintrag${changelogs.length!==1?'e':''}`;
+  document.getElementById('dl-count').textContent = String(downloads.length);
+  document.getElementById('st-cl').textContent    = `${changelogs.length} Changelog${changelogs.length!==1?'s':''}`;
+  document.getElementById('st-dl').textContent    = `${downloads.length} Download${downloads.length!==1?'s':''}`;
+}, () => {
+  document.getElementById('conn-dot').style.color  = '#c0392b';
+  document.getElementById('conn-text').textContent = 'Offline';
+  showNotif('⚠️ Datenbankverbindung fehlgeschlagen');
+});
+
+// ── Render Changelogs ──
+const typeConf = {
+  add: { label:'＋', cls:'add', text:'Neu' },
+  fix: { label:'🔧', cls:'fix', text:'Fix' },
+  chg: { label:'✏️', cls:'chg', text:'Änderung' }
+};
+
+function renderChangelogs(list) {
+  const loading = document.getElementById('cl-loading');
+  const empty   = document.getElementById('cl-empty');
+  const cont    = document.getElementById('cl-list');
+  loading.style.display = 'none';
+
+  if (!list.length) { empty.style.display='flex'; cont.innerHTML=''; return; }
+  empty.style.display = 'none';
+  cont.innerHTML = '';
+  list.forEach(item => cont.appendChild(makeClEntry(item)));
+}
+
+function makeClEntry(item) {
+  const div  = document.createElement('div');
+  div.className = 'cl-entry';
+  const date = item.timestamp?.toDate
+    ? item.timestamp.toDate().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'})
+    : '—';
+
+  let changesHtml = '';
+  if (Array.isArray(item.changes) && item.changes.length) {
+    const rows = item.changes.map(c => {
+      const conf = typeConf[c.type] || typeConf.chg;
+      return `<div class="cl-change-item">
+        <span class="cl-change-bullet ${conf.cls}">${conf.label}</span>
+        <span>${esc(c.text)}</span>
+      </div>`;
+    }).join('');
+    changesHtml = `<div class="cl-changes">${rows}</div>`;
+  }
+
+  div.innerHTML = `
+    <div class="cl-entry-header">
+      <span class="cl-version">${esc(item.version||'—')}</span>
+      <span class="cl-title-text">${esc(item.title||'')}</span>
+      <span class="cl-date">${date}</span>
+      <button class="cl-delete-btn" title="Löschen" onclick="askDelete('${item.id}','changelog',${JSON.stringify(esc(item.title||'?'))})">🗑</button>
+    </div>
+    <div class="cl-body">
+      ${item.description ? `<div class="cl-description">${esc(item.description)}</div>` : ''}
+      ${changesHtml}
+    </div>`;
+  return div;
+}
+
+// ── Render Downloads ──
+const platformIcons = {
+  Windows:'🪟', macOS:'🍎', Linux:'🐧', Android:'🤖',
+  iOS:'📱', Web:'🌐', 'itch.io':'🎮', Steam:'♨️', Sonstiges:'📦'
+};
+
+function renderDownloads(list) {
+  const loading = document.getElementById('dl-loading');
+  const empty   = document.getElementById('dl-empty');
+  const cont    = document.getElementById('dl-list');
+  loading.style.display = 'none';
+
+  if (!list.length) { empty.style.display='flex'; cont.innerHTML=''; return; }
+  empty.style.display = 'none';
+  cont.innerHTML = '';
+  list.forEach(item => cont.appendChild(makeDlCard(item)));
+}
+
+function makeDlCard(item) {
+  const card = document.createElement('div');
+  card.className = 'dl-card';
+  const icon = platformIcons[item.platform] || '📦';
+  const date = item.timestamp?.toDate
+    ? item.timestamp.toDate().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'})
+    : '—';
+
+  card.innerHTML = `
+    <div class="dl-card-header">
+      <span class="dl-platform-icon">${icon}</span>
+      <span class="dl-platform-name">${esc(item.platform||'Sonstiges')}</span>
+      <span class="dl-version-badge">${esc(item.version||'—')}</span>
+      <button class="dl-delete-btn" title="Löschen" onclick="askDelete('${item.id}','download',${JSON.stringify(esc(item.platform||'?'))})">🗑</button>
+    </div>
+    <div class="dl-card-body">
+      ${item.label ? `<div class="dl-label">${esc(item.label)}</div>` : ''}
+      <div class="dl-link-row">
+        <a class="dl-link" href="${esc(item.url)}" target="_blank" rel="noopener" title="${esc(item.url)}">${esc(shortenUrl(item.url))}</a>
+        <button class="dl-copy-btn" onclick="copyUrl('${esc(item.url)}')">📋 Kopieren</button>
+      </div>
+      <a class="dl-open-btn" href="${esc(item.url)}" target="_blank" rel="noopener">⬇️ Jetzt herunterladen</a>
+      ${item.note ? `<div class="dl-note">ℹ️ ${esc(item.note)}</div>` : ''}
+      <div class="dl-date">Hinzugefügt: ${date}</div>
+    </div>`;
+  return card;
+}
+
+function shortenUrl(url) {
+  try { const u = new URL(url); return u.hostname + (u.pathname.length > 28 ? u.pathname.slice(0,26)+'…' : u.pathname); }
+  catch { return url.slice(0,36)+'…'; }
+}
+
+// ── Copy URL ──
+window.copyUrl = async url => {
+  try { await navigator.clipboard.writeText(url); showNotif('📋 Link kopiert!'); }
+  catch { showNotif('⚠️ Kopieren fehlgeschlagen'); }
+};
+
+// ── Change-row builder ──
+window.addChangeRow = () => {
+  const row = document.createElement('div');
+  row.className = 'change-row';
+  row.innerHTML = `
+    <select class="win-select" style="width:95px;flex-shrink:0;padding:5px 6px">
+      <option value="add">＋ Neu</option>
+      <option value="fix">🔧 Fix</option>
+      <option value="chg">✏️ Änderung</option>
+    </select>
+    <input class="win-input" placeholder="Beschreibung der Änderung…" maxlength="120">
+    <button class="rm-btn" onclick="this.closest('.change-row').remove()">✕</button>`;
+  document.getElementById('change-list').appendChild(row);
+  row.querySelector('input').focus();
+};
+
+function getChangeRows() {
+  return [...document.querySelectorAll('#change-list .change-row')].map(r => ({
+    type: r.querySelector('select').value,
+    text: r.querySelector('input').value.trim()
+  })).filter(c => c.text);
+}
+
+// ── Submit Changelog ──
+window.submitChangelog = async () => {
+  const title   = document.getElementById('cl-title').value.trim();
+  const version = document.getElementById('cl-version').value.trim();
+  const desc    = document.getElementById('cl-desc').value.trim();
+  const changes = getChangeRows();
+  const errEl   = document.getElementById('cl-error');
+
+  if (!title || !version) {
+    errEl.textContent = '⚠️ Titel und Version sind Pflichtfelder!';
+    errEl.style.display = 'block'; return;
+  }
+  errEl.style.display = 'none';
+  const btn = document.getElementById('cl-submit-btn');
+  btn.disabled = true; btn.textContent = '⏳ Wird veröffentlicht…';
+  try {
+    await addDoc(colRef, { type:'changelog', title, version, description:desc, changes, timestamp: serverTimestamp() });
+    closeDialog('cl-dialog');
+    showNotif('✅ Changelog veröffentlicht!');
+  } catch(e) { errEl.textContent = '⚠️ Fehler: ' + e.message; errEl.style.display='block'; }
+  finally { btn.disabled=false; btn.textContent='📤 Veröffentlichen'; }
+};
+
+// ── Submit Download ──
+window.submitDownload = async () => {
+  const platform = document.getElementById('dl-platform').value;
+  const version  = document.getElementById('dl-version').value.trim();
+  const url      = document.getElementById('dl-url').value.trim();
+  const label    = document.getElementById('dl-label').value.trim();
+  const note     = document.getElementById('dl-note').value.trim();
+  const errEl    = document.getElementById('dl-error');
+
+  if (!version || !url) {
+    errEl.textContent = '⚠️ Version und URL sind Pflichtfelder!';
+    errEl.style.display = 'block'; return;
+  }
+  try { new URL(url); } catch {
+    errEl.textContent = '⚠️ Bitte eine gültige URL eingeben.';
+    errEl.style.display = 'block'; return;
+  }
+  errEl.style.display = 'none';
+  const btn = document.getElementById('dl-submit-btn');
+  btn.disabled = true; btn.textContent = '⏳ Wird gespeichert…';
+  try {
+    await addDoc(colRef, { type:'download', platform, version, url, label, note, timestamp: serverTimestamp() });
+    closeDialog('dl-dialog');
+    showNotif('✅ Download-Link hinzugefügt!');
+  } catch(e) { errEl.textContent = '⚠️ Fehler: ' + e.message; errEl.style.display='block'; }
+  finally { btn.disabled=false; btn.textContent='⬇️ Hinzufügen'; }
+};
+
+// ── Delete ──
+window.askDelete = (id, kind, title) => {
+  pendingDeleteId = id;
+  const label = kind === 'changelog' ? `Changelog "${title}"` : `Download für "${title}"`;
+  document.getElementById('confirm-msg').textContent =
+    `Möchtest du den ${label} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`;
+  document.getElementById('confirm-dialog').classList.add('open');
+};
+window.cancelDelete = () => {
+  pendingDeleteId = null;
+  document.getElementById('confirm-dialog').classList.remove('open');
+};
+window.confirmDelete = async () => {
+  if (!pendingDeleteId) return;
+  const id = pendingDeleteId; pendingDeleteId = null;
+  document.getElementById('confirm-dialog').classList.remove('open');
+  try { await deleteDoc(doc(db,"Blogposts",id)); showNotif('🗑 Gelöscht.'); }
+  catch(e) { showNotif('⚠️ Löschen fehlgeschlagen: ' + e.message); }
+};
+
+// ── Dialog helpers ──
+window.openChangelogDialog = () => {
+  document.getElementById('cl-title').value = '';
+  document.getElementById('cl-version').value = '';
+  document.getElementById('cl-desc').value = '';
+  document.getElementById('cl-error').style.display = 'none';
+  document.getElementById('change-list').innerHTML = '';
+  addChangeRow();
+  document.getElementById('cl-dialog').classList.add('open');
+  setTimeout(() => document.getElementById('cl-title').focus(), 80);
+};
+window.openDownloadDialog = () => {
+  ['dl-version','dl-url','dl-label','dl-note'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('dl-error').style.display = 'none';
+  document.getElementById('dl-dialog').classList.add('open');
+  setTimeout(() => document.getElementById('dl-version').focus(), 80);
+};
+window.closeDialog = id => document.getElementById(id).classList.remove('open');
+window.handleOverlay = (e, id) => { if(e.target===document.getElementById(id)) closeDialog(id); };
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    ['cl-dialog','dl-dialog','confirm-dialog'].forEach(id => document.getElementById(id).classList.remove('open'));
+  }
+});
+
+// ── Helpers ──
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showNotif(msg) {
+  const el = document.getElementById('notif');
+  el.textContent = msg; el.style.display = 'block';
+  clearTimeout(el._t); el._t = setTimeout(() => el.style.display='none', 2800);
+}
+</script>
+</body>
+</html>
