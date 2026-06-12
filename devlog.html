@@ -181,6 +181,15 @@ html, body {
   word-break: break-word;
 }
 
+.cl-thumbnail {
+  width: 100%; max-height: 220px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: 10px;
+  display: block;
+}
+
 /* change list inside body */
 .cl-changes { margin-top: 12px; display: flex; flex-direction: column; gap: 5px; }
 .cl-change-item {
@@ -537,6 +546,11 @@ html, body {
         <textarea id="cl-desc" class="win-textarea" style="height:70px" placeholder="Kurze Zusammenfassung des Updates…"></textarea>
       </div>
       <div class="field-row">
+        <label>🖼 Thumbnail-URL</label>
+        <input id="cl-thumbnail" class="win-input" type="url" placeholder="https://example.com/bild.png  (optional)" maxlength="500">
+        <span class="field-hint">Direktlink zu einem Bild (PNG, JPG, GIF, WebP). Wird oben im Eintrag angezeigt.</span>
+      </div>
+      <div class="field-row">
         <label>📋 Änderungen</label>
         <div class="field-hint">Typ wählen und Änderung eingeben (+ Neu, 🔧 Fix, ✏️ Änderung)</div>
         <div id="change-list"></div>
@@ -722,6 +736,7 @@ function makeClEntry(item) {
       <button class="cl-delete-btn" title="Löschen">🗑</button>
     </div>
     <div class="cl-body">
+      ${item.thumbnail ? `<img class="cl-thumbnail" src="${esc(item.thumbnail)}" alt="Thumbnail" loading="lazy" onerror="this.style.display='none'">` : ''}
       ${item.description ? `<div class="cl-description">${esc(item.description)}</div>` : ''}
       ${changesHtml}
     </div>`;
@@ -822,11 +837,12 @@ function getChangeRows() {
 
 // ── Submit Changelog ──
 window.submitChangelog = async () => {
-  const title   = document.getElementById('cl-title').value.trim();
-  const version = document.getElementById('cl-version').value.trim();
-  const desc    = document.getElementById('cl-desc').value.trim();
-  const changes = getChangeRows();
-  const errEl   = document.getElementById('cl-error');
+  const title     = document.getElementById('cl-title').value.trim();
+  const version   = document.getElementById('cl-version').value.trim();
+  const desc      = document.getElementById('cl-desc').value.trim();
+  const thumbnail = document.getElementById('cl-thumbnail').value.trim();
+  const changes   = getChangeRows();
+  const errEl     = document.getElementById('cl-error');
 
   if (!title || !version) {
     errEl.textContent = '⚠️ Titel und Version sind Pflichtfelder!';
@@ -836,7 +852,7 @@ window.submitChangelog = async () => {
   const btn = document.getElementById('cl-submit-btn');
   btn.disabled = true; btn.textContent = '⏳ Wird veröffentlicht…';
   try {
-    await addDoc(colRef, { type:'changelog', title, version, description:desc, changes, timestamp: serverTimestamp() });
+    await addDoc(colRef, { type:'changelog', title, version, description:desc, thumbnail, changes, timestamp: serverTimestamp() });
     closeDialog('cl-dialog');
     showNotif('✅ Changelog veröffentlicht!');
   } catch(e) { errEl.textContent = '⚠️ Fehler: ' + e.message; errEl.style.display='block'; }
@@ -896,6 +912,7 @@ window.openChangelogDialog = () => {
   document.getElementById('cl-title').value = '';
   document.getElementById('cl-version').value = '';
   document.getElementById('cl-desc').value = '';
+  document.getElementById('cl-thumbnail').value = '';
   document.getElementById('cl-error').style.display = 'none';
   document.getElementById('change-list').innerHTML = '';
   addChangeRow();
